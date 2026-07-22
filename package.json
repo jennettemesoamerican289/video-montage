@@ -6,6 +6,14 @@
   "description": "Локальный видеоредактор: кадры видео на таймлайне, расстановка mp3-озвучки, кроп, вырезка, синхронное превью и сборка в mp4 через ffmpeg.",
   "license": "GPL-3.0-or-later",
   "author": "Vladimir Miroshnichenko <vov.mir28@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gitmir-hello/video-montage.git"
+  },
+  "homepage": "https://github.com/gitmir-hello/video-montage#readme",
+  "bugs": {
+    "url": "https://github.com/gitmir-hello/video-montage/issues"
+  },
   "scripts": {
     "dev": "concurrently -n server,client -c blue,green \"npm:server\" \"npm:client\"",
     "server": "node server/index.js",

@@ -43,7 +43,7 @@ ffmpeg устанавливать **не нужно** — он подтягив�
 ## Установка и запуск
 
 ```bash
-git clone https://github.com/<user>/video-montage.git
+git clone https://github.com/gitmir-hello/video-montage.git
 cd video-montage
 npm install          # заодно скачает бинарник ffmpeg
 npm run dev          # бэкенд :3001 + фронтенд :5173
