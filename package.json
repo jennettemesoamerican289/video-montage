@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Local video editor: video frames on a timeline, mp3 voiceover, crop, cut, synced preview, and mp4 export via ffmpeg.",
+  "description": "Create product demo videos locally and fast: Claude Code writes timed voiceover from your video frames, batch-import the mp3s and each clip auto-places by timing. Local ffmpeg, React + Vite.",
   "license": "GPL-3.0-or-later",
   "author": "gitmir (https://gitmir.com)",
   "repository": {

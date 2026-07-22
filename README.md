@@ -1,15 +1,24 @@
 # 🎬 Video Montage
 
-A local, in-browser video editor with a holographic HUD interface. Everything runs
-on your machine: video and audio are never uploaded anywhere — they're processed by
-a local backend via [ffmpeg](https://ffmpeg.org/).
+**Create product demo videos locally and fast.** A local, in-browser video editor
+where the voiceover practically writes itself — load a screen recording and let
+[Claude Code](https://claude.com/claude-code) turn its frames into timed narration.
 
-Built for a simple workflow: **take a video, lay a voiceover on top, and export an
-mp4** — with handy [Claude Code](https://claude.com/claude-code) integration that
-generates voiceover text straight from the video frames.
+**The core loop:**
 
-The holographic HUD interface comes from **[gitmir.com](https://gitmir.com)** — a
-visual, AI-native IDE that renders a product's architecture as a living blueprint.
+1. **Load a video** — its frames appear on the timeline.
+2. Click **"📋 Voiceover plan for Claude"** — it copies a prompt with the video's
+   frames (as images) and their timings.
+3. **Paste it into Claude Code.** It looks at the frames and returns an array of
+   voiceover lines with timings: `[{ start, end, text }, …]`.
+4. Generate one mp3 per line in any TTS, then hit **"📥 Import voiceover"**: paste
+   Claude's array and drop in the whole batch of audio files at once — the app
+   **auto-places every clip at its correct timing**.
+5. **Preview with sound**, then **export an mp4**.
+
+Everything runs on your machine — video and audio are never uploaded; they're
+processed by a local [ffmpeg](https://ffmpeg.org/) backend. The holographic HUD
+interface comes from **[gitmir.com](https://gitmir.com)**.
 
 ![Video Montage interface](docs/preview.svg)
 
