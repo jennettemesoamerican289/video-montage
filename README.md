@@ -1,8 +1,19 @@
 # 🎬 Video Montage
 
-**Create product demo videos locally and fast.** A local, in-browser video editor
-where the voiceover practically writes itself — load a screen recording and let
-[Claude Code](https://claude.com/claude-code) turn its frames into timed narration.
+> From the team at **[GITMIR](https://gitmir.com)** — a tool we built for ourselves,
+> now open to everyone.
+
+**Create product demo videos locally and fast.**
+
+We ship a lot of product demos at GITMIR, and recording the screen was never the hard
+part — voicing it over was: writing the script, matching it to what's happening on
+screen, and nudging a dozen little audio clips into place by hand. So we built Video
+Montage to take that off our plate. It turned out useful enough that we use it every
+day — so we're releasing it as open source.
+
+It's a local, in-browser video editor where the voiceover practically writes itself:
+load a screen recording and let [Claude Code](https://claude.com/claude-code) turn its
+frames into timed narration.
 
 **The core loop:**
 
@@ -110,6 +121,18 @@ data/projects/<id>/
 Crop is stored in fractions (resolution-independent), cuts in seconds. The final
 export is a single ffmpeg call with `filter_complex`: cuts (`trim`+`concat`) → crop
 (`crop`) → voiceover mix (`adelay`+`amix`), re-encoded to H.264/AAC.
+
+## Contributing & feedback
+
+Video Montage is free and open source. If something's missing, you hit a bug, or you'd
+like to join as a contributor — you're welcome. Open an
+[issue](https://github.com/gitmir-hello/video-montage/issues) or a pull request; see
+[CONTRIBUTING.md](CONTRIBUTING.md) to get started.
+
+We built this in the open because good tools should be shared. If it saves you time on
+your own demos, that's the whole point.
+
+— the [GITMIR](https://gitmir.com) team
 
 ## License
 
