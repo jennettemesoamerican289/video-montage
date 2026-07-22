@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Local video editor: video frames on a timeline, mp3 voiceover, crop, cut, synced preview, and mp4 export via ffmpeg.",
   "license": "GPL-3.0-or-later",
-  "author": "Vladimir Miroshnichenko <vov.mir28@gmail.com>",
+  "author": "gitmir (https://gitmir.com)",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gitmir-hello/video-montage.git"

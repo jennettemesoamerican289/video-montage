@@ -104,7 +104,7 @@ export is a single ffmpeg call with `filter_complex`: cuts (`trim`+`concat`) →
 
 ## License
 
-[GNU GPL-3.0-or-later](LICENSE) © Vladimir Miroshnichenko
+[GNU GPL-3.0-or-later](LICENSE) © gitmir
 
 ---
 
