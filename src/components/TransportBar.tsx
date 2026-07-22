@@ -5,7 +5,7 @@ interface Props {
   duration: number
 }
 
-// Панель воспроизведения ПОД видео: в начало, play/pause, время, скраббер.
+// Playback bar BELOW the video: to-start, play/pause, time, scrubber.
 export default function TransportBar({ transport, duration }: Props) {
   const { playing, time, toggle, seek } = transport
   const pct = duration > 0 ? Math.min(100, (time / duration) * 100) : 0
@@ -18,16 +18,16 @@ export default function TransportBar({ transport, duration }: Props) {
 
   return (
     <div className="transport">
-      <button className="btn icon" onClick={() => seek(0)} title="В начало">⏮</button>
+      <button className="btn icon" onClick={() => seek(0)} title="To start">⏮</button>
       <button
         className="btn primary play-btn"
         onClick={toggle}
-        title={playing ? 'Пауза (пробел)' : 'Играть (пробел)'}
+        title={playing ? 'Pause (space)' : 'Play (space)'}
       >
         {playing ? '❚❚' : '▶'}
       </button>
       <span className="tcode mono">{fmt(time)}</span>
-      <div className="scrub" onClick={scrub} title="Перемотка">
+      <div className="scrub" onClick={scrub} title="Seek">
         <div className="scrub-fill" style={{ width: `${pct}%` }} />
         <div className="scrub-knob" style={{ left: `${pct}%` }} />
       </div>

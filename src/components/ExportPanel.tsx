@@ -10,8 +10,8 @@ interface Props {
   onExport: () => void
 }
 
-// Нижняя панель: план озвучки для Claude, импорт озвучки по таймингам,
-// сборка mp4 и ссылка на результат.
+// Bottom panel: voiceover plan for Claude, voiceover import by timings,
+// mp4 export and a link to the result.
 export default function ExportPanel({
   clipCount,
   busy,
@@ -24,28 +24,28 @@ export default function ExportPanel({
   return (
     <footer className="export">
       <div className="export-info">
-        Аудио-клипов на таймлайне: <strong>{clipCount}</strong>
+        Audio clips on the timeline: <strong>{clipCount}</strong>
       </div>
       <button
         className="btn"
         onClick={onCopyPlan}
-        title="Скопировать JSON с кадрами и таймингами — вставить в Claude Code для генерации текстов озвучки"
+        title="Copy JSON with frames and timings — paste into Claude Code to generate voiceover text"
       >
-        {copied ? 'Скопировано ✓' : '📋 План озвучки для Claude'}
+        {copied ? 'Copied ✓' : '📋 Voiceover plan for Claude'}
       </button>
       <button
         className="btn"
         onClick={onImport}
-        title="Импортировать mp3 по JSON-таймингам от Claude Code"
+        title="Import mp3s by JSON timings from Claude Code"
       >
-        📥 Импорт озвучки
+        📥 Import voiceover
       </button>
       <button className="btn primary" disabled={busy} onClick={onExport}>
-        {busy ? 'Собираю…' : 'Собрать mp4'}
+        {busy ? 'Building…' : 'Export mp4'}
       </button>
       {result && (
         <a className="btn download" href={result.url} download={result.name}>
-          ⬇ Скачать {result.name}
+          ⬇ Download {result.name}
         </a>
       )}
     </footer>

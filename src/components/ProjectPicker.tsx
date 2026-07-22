@@ -6,7 +6,7 @@ interface Props {
   onOpen: (id: string) => void
 }
 
-// Стартовый экран: список сохранённых проектов + создание нового.
+// Start screen: list of saved projects + create a new one.
 export default function ProjectPicker({ onOpen }: Props) {
   const [projects, setProjects] = useState<ProjectSummary[] | null>(null)
   const [name, setName] = useState('')
@@ -26,7 +26,7 @@ export default function ProjectPicker({ onOpen }: Props) {
     setCreating(true)
     setError(null)
     try {
-      const p = await createProject(name.trim() || 'Новый проект')
+      const p = await createProject(name.trim() || 'New project')
       onOpen(p.id)
     } catch (e) {
       setError(String((e as Error).message || e))
@@ -35,7 +35,7 @@ export default function ProjectPicker({ onOpen }: Props) {
   }
 
   const remove = async (id: string, projName: string) => {
-    if (!confirm(`Удалить проект «${projName}» вместе со всеми файлами?`)) return
+    if (!confirm(`Delete project "${projName}" and all its files?`)) return
     try {
       await deleteProject(id)
       refresh()
@@ -47,39 +47,39 @@ export default function ProjectPicker({ onOpen }: Props) {
   return (
     <div className="picker">
       <div className="eyebrow">◆ Video Montage — Holographic Editor</div>
-      <h1 className="picker-title">Проекты</h1>
-      <p className="picker-sub">Выберите проект или создайте новый — всё сохраняется автоматически.</p>
+      <h1 className="picker-title">Projects</h1>
+      <p className="picker-sub">Pick a project or create a new one — everything saves automatically.</p>
 
       <div className="new-project">
         <input
           className="text-input"
-          placeholder="Название нового проекта"
+          placeholder="New project name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && !creating && create()}
         />
         <button className="btn primary" disabled={creating} onClick={create}>
-          {creating ? 'Создаю…' : '+ Создать проект'}
+          {creating ? 'Creating…' : '+ Create project'}
         </button>
       </div>
 
       {error && <div className="banner error">⚠ {error}</div>}
 
       <div className="project-list">
-        {projects === null && <div className="muted">Загрузка…</div>}
-        {projects?.length === 0 && <div className="muted">Пока нет проектов.</div>}
+        {projects === null && <div className="muted">Loading…</div>}
+        {projects?.length === 0 && <div className="muted">No projects yet.</div>}
         {projects?.map((p) => (
           <div key={p.id} className="project-card hud-panel hoverable" onClick={() => onOpen(p.id)}>
             <div className="pc-main">
               <div className="pc-name">{p.name}</div>
               <div className="pc-meta">
-                {p.hasVideo ? '🎞️ видео есть' : 'без видео'} · клипов: {p.clipCount} · изменён{' '}
+                {p.hasVideo ? '🎞️ has video' : 'no video'} · clips: {p.clipCount} · updated{' '}
                 {fmtDate(p.updatedAt)}
               </div>
             </div>
             <button
               className="pc-remove"
-              title="Удалить проект"
+              title="Delete project"
               onClick={(e) => {
                 e.stopPropagation()
                 remove(p.id, p.name)
@@ -97,7 +97,7 @@ export default function ProjectPicker({ onOpen }: Props) {
 function fmtDate(iso: string): string {
   const d = new Date(iso)
   if (isNaN(d.getTime())) return '—'
-  return d.toLocaleString('ru-RU', {
+  return d.toLocaleString('en-US', {
     day: '2-digit',
     month: '2-digit',
     hour: '2-digit',

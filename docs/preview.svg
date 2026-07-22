@@ -31,18 +31,18 @@
   <text x="24" y="34" font-size="17" font-weight="700" fill="#ffffff">🎬 VIDEO MONTAGE</text>
   <text x="215" y="33" font-size="11" fill="#8aecff" opacity="0.8">/ HOLOGRAPHIC EDITOR</text>
   <g font-size="12" fill="#bcd2ec">
-    <rect x="672" y="15" width="78" height="26" fill="none" stroke="#283448"/><text x="686" y="32">+ видео</text>
-    <rect x="758" y="15" width="78" height="26" fill="none" stroke="#283448"/><text x="772" y="32">+ аудио</text>
-    <rect x="844" y="15" width="82" height="26" fill="none" stroke="#2fd8ff"/><text x="857" y="32" fill="#2fd8ff">⛶ Кроп</text>
-    <rect x="934" y="15" width="104" height="26" fill="none" stroke="#283448"/><text x="947" y="32">✂ Вырезать</text>
-    <rect x="1046" y="15" width="130" height="26" fill="#e8f0ff"/><text x="1064" y="32" fill="#05070c" font-weight="700">Собрать mp4</text>
+    <rect x="672" y="15" width="78" height="26" fill="none" stroke="#283448"/><text x="686" y="32">+ video</text>
+    <rect x="758" y="15" width="78" height="26" fill="none" stroke="#283448"/><text x="772" y="32">+ audio</text>
+    <rect x="844" y="15" width="82" height="26" fill="none" stroke="#2fd8ff"/><text x="857" y="32" fill="#2fd8ff">⛶ Crop</text>
+    <rect x="934" y="15" width="104" height="26" fill="none" stroke="#283448"/><text x="947" y="32">✂ Cut</text>
+    <rect x="1046" y="15" width="130" height="26" fill="#e8f0ff"/><text x="1064" y="32" fill="#05070c" font-weight="700">Export mp4</text>
   </g>
 
-  <!-- видео-превью (большая область) -->
+  <!-- video preview (large area) -->
   <g>
     <rect x="352" y="86" width="496" height="300" fill="url(#panel)" stroke="#78d2ff" stroke-opacity="0.25"/>
     <rect x="358" y="92" width="484" height="288" fill="#05080f"/>
-    <!-- угловые скобки cyan -->
+    <!-- cyan corner brackets -->
     <g stroke="#2fd8ff" stroke-width="2.5" fill="none">
       <path d="M352 100 L352 86 L366 86"/>
       <path d="M834 86 L848 86 L848 100"/>
@@ -50,16 +50,16 @@
       <path d="M834 386 L848 386 L848 372"/>
     </g>
     <line x1="374" y1="86" x2="826" y2="86" stroke="#5fdeff" stroke-opacity="0.55"/>
-    <!-- play кнопка -->
+    <!-- play button -->
     <circle cx="600" cy="236" r="34" fill="#2fd8ff" fill-opacity="0.12" stroke="#2fd8ff" stroke-opacity="0.7"/>
     <path d="M590 220 L616 236 L590 252 Z" fill="#8aecff"/>
-    <!-- мета-чип -->
+    <!-- meta chip -->
     <rect x="372" y="104" width="188" height="38" fill="#060c1a" fill-opacity="0.75" stroke="#78d2ff" stroke-opacity="0.25"/>
     <text x="384" y="120" font-size="12" fill="#ffffff" font-weight="600">clip.mp4</text>
     <text x="384" y="134" font-size="10.5" fill="#8aecff">0:42 · 1280×720 · 30 fps</text>
   </g>
 
-  <!-- транспорт -->
+  <!-- transport -->
   <g>
     <rect x="0" y="404" width="1200" height="44" fill="#081020" fill-opacity="0.65"/>
     <line x1="0" y1="404" x2="1200" y2="404" stroke="#78d2ff" stroke-opacity="0.22"/>
@@ -72,22 +72,22 @@
     <text x="1128" y="431" font-size="12" fill="#607692">0:42</text>
   </g>
 
-  <!-- таймлайн -->
+  <!-- timeline -->
   <g>
     <!-- gutter -->
     <rect x="0" y="448" width="76" height="272" fill="#070f22" fill-opacity="0.7"/>
     <line x1="76" y1="448" x2="76" y2="720" stroke="#78d2ff" stroke-opacity="0.22"/>
-    <text x="14" y="512" font-size="10.5" fill="#8aecff" letter-spacing="1.5">ВИДЕО</text>
-    <text x="14" y="618" font-size="10.5" fill="#8aecff" letter-spacing="1.5">АУДИО</text>
+    <text x="14" y="512" font-size="10.5" fill="#8aecff" letter-spacing="1.5">VIDEO</text>
+    <text x="14" y="618" font-size="10.5" fill="#8aecff" letter-spacing="1.5">AUDIO</text>
 
-    <!-- линейка -->
+    <!-- ruler -->
     <rect x="76" y="448" width="1124" height="24" fill="#0a1322" fill-opacity="0.5"/>
     <g font-size="10" fill="#607692">
-      <text x="86" y="464">0с</text><text x="266" y="464">5</text><text x="446" y="464">10</text>
+      <text x="86" y="464">0s</text><text x="266" y="464">5</text><text x="446" y="464">10</text>
       <text x="626" y="464">15</text><text x="806" y="464">20</text><text x="986" y="464">25</text><text x="1146" y="464">30</text>
     </g>
 
-    <!-- видео-дорожка: кадры -->
+    <!-- video track: frames -->
     <rect x="76" y="472" width="1124" height="90" fill="#0c1626"/>
     <g>
       <rect x="80" y="472" width="58" height="90" fill="url(#frame)"/>
@@ -106,7 +106,7 @@
       <rect x="1040" y="472" width="58" height="90" fill="url(#frame)"/>
       <rect x="1100" y="472" width="58" height="90" fill="url(#frame)"/>
     </g>
-    <!-- вырез (красная зона) -->
+    <!-- cut (red zone) -->
     <rect x="380" y="472" width="180" height="90" fill="#ff5566" fill-opacity="0.28" stroke="#ff5566" stroke-width="2"/>
     <rect x="380" y="472" width="180" height="90" fill="url(#hatch)"/>
     <pattern id="hatch" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -114,7 +114,7 @@
     </pattern>
     <rect x="542" y="474" width="16" height="16" fill="#ff5566"/><text x="546" y="486" font-size="11" fill="#fff">×</text>
 
-    <!-- аудио-дорожка: teal клипы -->
+    <!-- audio track: teal clips -->
     <rect x="76" y="562" width="1124" height="64" fill="#060c1a"/>
     <g>
       <rect x="82" y="568" width="150" height="52" fill="url(#clip)" stroke="#19e3c2" rx="0"/>
@@ -127,19 +127,19 @@
       <text x="810" y="598" font-size="11" fill="#04110f" font-weight="600">3.mp3</text>
     </g>
 
-    <!-- плейхед -->
+    <!-- playhead -->
     <line x1="316" y1="448" x2="316" y2="626" stroke="#2fd8ff" stroke-width="2"/>
     <path d="M310 448 L322 448 L316 458 Z" fill="#2fd8ff"/>
   </g>
 
-  <!-- нижняя панель -->
+  <!-- bottom panel -->
   <rect x="0" y="626" width="1200" height="94" fill="#0a1322" fill-opacity="0.6"/>
   <line x1="0" y1="626" x2="1200" y2="626" stroke="#78d2ff" stroke-opacity="0.22"/>
   <g font-size="12">
-    <text x="24" y="678" fill="#8497b8">Аудио-клипов: <tspan fill="#8aecff" font-weight="700">4</tspan></text>
-    <rect x="200" y="662" width="220" height="30" fill="none" stroke="#283448"/><text x="216" y="682" fill="#bcd2ec">📋 План озвучки для Claude</text>
-    <rect x="436" y="662" width="150" height="30" fill="none" stroke="#283448"/><text x="452" y="682" fill="#bcd2ec">📥 Импорт озвучки</text>
-    <rect x="602" y="662" width="130" height="30" fill="#2fd8ff"/><text x="622" y="682" fill="#05070c" font-weight="700">Собрать mp4</text>
-    <rect x="748" y="662" width="180" height="30" fill="#1f7a44"/><text x="764" y="682" fill="#ffffff">⬇ Скачать montage.mp4</text>
+    <text x="24" y="678" fill="#8497b8">Audio clips: <tspan fill="#8aecff" font-weight="700">4</tspan></text>
+    <rect x="200" y="662" width="220" height="30" fill="none" stroke="#283448"/><text x="216" y="682" fill="#bcd2ec">📋 Voiceover plan for Claude</text>
+    <rect x="436" y="662" width="150" height="30" fill="none" stroke="#283448"/><text x="452" y="682" fill="#bcd2ec">📥 Import voiceover</text>
+    <rect x="602" y="662" width="130" height="30" fill="#2fd8ff"/><text x="622" y="682" fill="#05070c" font-weight="700">Export mp4</text>
+    <rect x="748" y="662" width="180" height="30" fill="#1f7a44"/><text x="764" y="682" fill="#ffffff">⬇ Download montage.mp4</text>
   </g>
 </svg>

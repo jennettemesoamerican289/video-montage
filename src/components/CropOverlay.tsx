@@ -22,15 +22,15 @@ type Handle = (typeof HANDLES)[number] | 'move'
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
 
-// Рамка кропа поверх видео. Позиционируется по ФАКТИЧЕСКОМУ прямоугольнику
-// видимого кадра (с учётом object-fit: contain и любого letterbox), а не по
-// размеру видеоэлемента — иначе на видео не-16:9 рамка уезжает за кадр.
+// Crop frame over the video. Positioned by the ACTUAL rectangle of the visible
+// frame (accounting for object-fit: contain and any letterbox), not by the
+// video element size — otherwise on non-16:9 video the frame drifts off-screen.
 export default function CropOverlay({ videoRef, crop, onChange }: Props) {
   const eff = crop ?? FULL
   const [box, setBox] = useState<Box>({ left: 0, top: 0, width: 0, height: 0 })
   const drag = useRef<{ h: Handle; sx: number; sy: number; orig: Crop } | null>(null)
 
-  // Вычисляет прямоугольник видимого кадра внутри видеоэлемента.
+  // Computes the visible frame rectangle inside the video element.
   useLayoutEffect(() => {
     const v = videoRef.current
     if (!v) return
@@ -71,7 +71,7 @@ export default function CropOverlay({ videoRef, crop, onChange }: Props) {
   const onMove = (e: React.PointerEvent) => {
     const d = drag.current
     if (!d || box.width === 0 || box.height === 0) return
-    // delta в долях — относительно ВИДИМОГО кадра, а не элемента.
+    // delta in fractions — relative to the VISIBLE frame, not the element.
     const dx = (e.clientX - d.sx) / box.width
     const dy = (e.clientY - d.sy) / box.height
     let { x, y, w, h } = d.orig

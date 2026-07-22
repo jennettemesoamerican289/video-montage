@@ -40,9 +40,9 @@ export default function App() {
   const [cuts, setCuts] = useState<Cut[]>([])
   const [cutMode, setCutMode] = useState(false)
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  // Гасит один прогон автосохранения — сразу после загрузки проекта с сервера.
+  // Suppresses one autosave run — right after a project is loaded from the server.
   const suppressSave = useRef(false)
-  // Синхронное превью: видео + аудио-клипы играют вместе, вырезы перепрыгиваются.
+  // Synced preview: video + audio clips play together, cuts are skipped over.
   const transport = useTransport(videoRef, clips, cuts)
 
   const withBusy = useCallback(async (label: string, fn: () => Promise<void>) => {
@@ -57,10 +57,10 @@ export default function App() {
     }
   }, [])
 
-  // --- Открытие / закрытие проекта ------------------------------------------
+  // --- Open / close project -------------------------------------------------
   const openProject = useCallback(
     (id: string) =>
-      withBusy('Открываю проект…', async () => {
+      withBusy('Opening project…', async () => {
         const p = await getProject(id)
         suppressSave.current = true
         setProjectId(p.id)
@@ -90,7 +90,7 @@ export default function App() {
     setSaveState('idle')
   }, [])
 
-  // --- Автосохранение состояния (имя + клипы) с дебаунсом --------------------
+  // --- Debounced autosave of state (name + clips + crop + cuts) --------------
   useEffect(() => {
     if (!projectId) return
     if (suppressSave.current) {
@@ -109,22 +109,22 @@ export default function App() {
     return () => clearTimeout(t)
   }, [clips, projectName, projectId, crop, cuts])
 
-  // --- Медиа -----------------------------------------------------------------
+  // --- Media -----------------------------------------------------------------
   const handleVideoFile = useCallback(
     (file: File) =>
-      withBusy('Извлекаю кадры из видео…', async () => {
+      withBusy('Extracting frames from video…', async () => {
         if (!projectId) return
         const v = await uploadVideo(projectId, file)
         setVideo(v)
-        setCrop(null) // сервер сбросил кроп под новый файл
-        setCuts([]) // и вырезы
+        setCrop(null) // server reset the crop for the new file
+        setCuts([]) // and the cuts
         setResult(null)
       }),
     [withBusy, projectId],
   )
 
-  // Пакетная загрузка mp3: файлы кладутся ВСТЫК, один за другим, в порядке выбора.
-  // startAt задан при drop (начинать с позиции курсора), иначе — от конца раскладки.
+  // Batch mp3 upload: files are placed BACK-TO-BACK, one after another, in pick order.
+  // startAt is set on drop (start at the cursor position), otherwise from the layout end.
   const addAudioFiles = useCallback(
     async (files: File[], startAt?: number) => {
       if (!projectId || files.length === 0) return
@@ -132,7 +132,7 @@ export default function App() {
       try {
         const assets: AudioAsset[] = []
         for (let i = 0; i < files.length; i++) {
-          setBusy(`Загружаю аудио ${i + 1}/${files.length}: ${files[i].name}`)
+          setBusy(`Uploading audio ${i + 1}/${files.length}: ${files[i].name}`)
           assets.push(await uploadAudio(projectId, files[i]))
         }
         setClips((prev) => {
@@ -148,7 +148,7 @@ export default function App() {
               url: a.url,
               start: cursor,
             }
-            cursor += a.duration // следующий встык за этим
+            cursor += a.duration // next one right after this
             return clip
           })
           return [...prev, ...added]
@@ -175,7 +175,7 @@ export default function App() {
     setResult(null)
   }, [])
 
-  // Импорт озвучки по таймингам: каждый файл кладётся на start своего сегмента.
+  // Voiceover import by timings: each file is placed at its segment's start.
   const importVoiceover = useCallback(
     async (files: File[], starts: number[], replace: boolean) => {
       if (!projectId || files.length === 0) return
@@ -184,7 +184,7 @@ export default function App() {
       try {
         const added: AudioClip[] = []
         for (let i = 0; i < files.length; i++) {
-          setBusy(`Импорт озвучки ${i + 1}/${files.length}: ${files[i].name}`)
+          setBusy(`Importing voiceover ${i + 1}/${files.length}: ${files[i].name}`)
           const a = await uploadAudio(projectId, files[i])
           added.push({
             clipId: crypto.randomUUID(),
@@ -206,7 +206,7 @@ export default function App() {
     [projectId],
   )
 
-  // Добавляет вырез [start,end] (секунды исходного видео).
+  // Adds a cut [start,end] (seconds of the original video).
   const addCut = useCallback((start: number, end: number) => {
     if (end - start < 0.05) return
     setCuts((prev) => [...prev, { start, end }].sort((a, b) => a.start - b.start))
@@ -218,11 +218,11 @@ export default function App() {
     setResult(null)
   }, [])
 
-  // Удаляет все аудио-клипы с таймлайна разом (с подтверждением).
+  // Removes all audio clips from the timeline at once (with confirmation).
   const clearAudio = useCallback(() => {
     setClips((prev) => {
       if (prev.length === 0) return prev
-      if (!confirm(`Удалить все аудио-клипы (${prev.length})?`)) return prev
+      if (!confirm(`Remove all audio clips (${prev.length})?`)) return prev
       setResult(null)
       return []
     })
@@ -230,7 +230,7 @@ export default function App() {
 
   const handleExport = useCallback(
     () =>
-      withBusy('Собираю mp4 (перекодирование может занять время)…', async () => {
+      withBusy('Building mp4 (re-encoding may take a while)…', async () => {
         if (!projectId) return
         const r = await exportMontage(projectId, clips, crop, cuts)
         setResult(r)
@@ -238,7 +238,7 @@ export default function App() {
     [withBusy, projectId, clips, crop, cuts],
   )
 
-  // Копирует JSON-план озвучки (кадры + тайминги) в буфер для вставки в Claude Code.
+  // Copies the voiceover-plan JSON (frames + timings) to the clipboard for Claude Code.
   const handleCopyPlan = useCallback(async () => {
     if (!projectId) return
     setError(null)
@@ -255,7 +255,7 @@ export default function App() {
   const zoom = (factor: number) =>
     setPxPerSec((p) => Math.min(MAX_PX, Math.max(MIN_PX, +(p * factor).toFixed(2))))
 
-  // Пробел — play/pause (кроме случаев, когда фокус в поле ввода).
+  // Space — play/pause (except when focus is in an input field).
   useEffect(() => {
     if (!video) return
     const onKey = (e: KeyboardEvent) => {
@@ -270,7 +270,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [video, transport.toggle])
 
-  // --- Экран выбора проекта --------------------------------------------------
+  // --- Project picker screen -------------------------------------------------
   if (!projectId) {
     return (
       <div className="app">
@@ -280,27 +280,27 @@ export default function App() {
     )
   }
 
-  // --- Редактор проекта ------------------------------------------------------
+  // --- Project editor --------------------------------------------------------
   return (
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <button className="btn ghost back" onClick={closeProject} title="К списку проектов">
-            ← Проекты
+          <button className="btn ghost back" onClick={closeProject} title="Back to projects">
+            ← Projects
           </button>
           <input
             className="text-input project-name"
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
-            title="Название проекта"
+            title="Project name"
           />
           <span className={`save-state ${saveState}`}>
-            {saveState === 'saving' ? 'Сохранение…' : saveState === 'saved' ? 'Сохранено ✓' : ''}
+            {saveState === 'saving' ? 'Saving…' : saveState === 'saved' ? 'Saved ✓' : ''}
           </span>
         </div>
         <div className="toolbar">
           <label className="btn ghost">
-            {video ? 'Заменить видео' : '+ видео'}
+            {video ? 'Replace video' : '+ video'}
             <input
               type="file"
               accept="video/*"
@@ -311,7 +311,7 @@ export default function App() {
           {video && (
             <>
               <label className="btn ghost">
-                + аудио
+                + audio
                 <input
                   type="file"
                   accept="audio/*"
@@ -328,9 +328,9 @@ export default function App() {
                 <button
                   className="btn danger"
                   onClick={clearAudio}
-                  title="Удалить все аудио-клипы с таймлайна"
+                  title="Remove all audio clips from the timeline"
                 >
-                  🗑 Очистить аудио ({clips.length})
+                  🗑 Clear audio ({clips.length})
                 </button>
               )}
               <button
@@ -339,13 +339,13 @@ export default function App() {
                   setCropMode((m) => !m)
                   setCutMode(false)
                 }}
-                title="Кроп: двигай рамку поверх видео, чтобы обрезать края кадра"
+                title="Crop: drag the frame over the video to trim the edges"
               >
-                ⛶ Кроп{crop ? ' •' : ''}
+                ⛶ Crop{crop ? ' •' : ''}
               </button>
               {crop && (
-                <button className="btn ghost" onClick={() => setCrop(null)} title="Сбросить кроп">
-                  Сброс
+                <button className="btn ghost" onClick={() => setCrop(null)} title="Reset crop">
+                  Reset
                 </button>
               )}
               <button
@@ -354,19 +354,19 @@ export default function App() {
                   setCutMode((m) => !m)
                   setCropMode(false)
                 }}
-                title="Вырезать куски: тяни по видео-дорожке, чтобы отметить фрагмент на удаление"
+                title="Cut: drag across the video track to mark a segment for removal"
               >
-                ✂ Вырезать{cuts.length ? ` (${cuts.length})` : ''}
+                ✂ Cut{cuts.length ? ` (${cuts.length})` : ''}
               </button>
               {cuts.length > 0 && (
-                <button className="btn ghost" onClick={() => setCuts([])} title="Убрать все вырезы">
-                  Сброс
+                <button className="btn ghost" onClick={() => setCuts([])} title="Remove all cuts">
+                  Reset
                 </button>
               )}
               <div className="zoom">
-                <button className="btn icon" onClick={() => zoom(1 / 1.4)} title="Отдалить">−</button>
-                <span className="zoom-label">{Math.round(pxPerSec)} px/с</span>
-                <button className="btn icon" onClick={() => zoom(1.4)} title="Приблизить">+</button>
+                <button className="btn icon" onClick={() => zoom(1 / 1.4)} title="Zoom out">−</button>
+                <span className="zoom-label">{Math.round(pxPerSec)} px/s</span>
+                <button className="btn icon" onClick={() => zoom(1.4)} title="Zoom in">+</button>
               </div>
             </>
           )}

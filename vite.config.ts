@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// В dev фронт крутится на 5173, а бэкенд с ffmpeg — на 3001.
-// Прокси перенаправляет запросы API и медиа-файлов (кадры, аудио, экспорт) на бэкенд.
+// In dev the frontend runs on 5173, and the ffmpeg backend on 3001.
+// The proxy forwards API and media requests (frames, audio, exports) to the backend.
 export default defineConfig({
   plugins: [react()],
   server: {

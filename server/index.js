@@ -1,7 +1,7 @@
-// Локальный бэкенд видеоредактора с проектами.
-// Проекты хранятся на диске (см. projects.js) и переживают перезапуск.
-// Сервер отвечает за приём медиа, извлечение кадров через ffmpeg,
-// раздачу медиа-файлов и сборку mp4.
+// Local video-editor backend with projects.
+// Projects are stored on disk (see projects.js) and survive restarts.
+// The server handles media uploads, frame extraction via ffmpeg,
+// serving media files and mp4 export.
 import express from 'express'
 import multer from 'multer'
 import { mkdir, rename, copyFile, unlink, rm, readdir } from 'node:fs/promises'
@@ -25,12 +25,12 @@ const PORT = process.env.PORT || 3001
 const app = express()
 app.use(express.json())
 
-// Раздача всех медиа проектов под /media/projects/<id>/...
+// Serve all project media under /media/projects/<id>/...
 app.use('/media', express.static(DATA))
 
 const upload = multer({ dest: TMP })
 
-// multer кладёт файл во временную папку; переносим в целевой каталог.
+// multer puts the file in a temp folder; move it to the target directory.
 async function moveFile(from, to) {
   try {
     await rename(from, to)
@@ -44,7 +44,7 @@ async function moveFile(from, to) {
   }
 }
 
-// Собирает клиентское представление проекта: добавляет URL к медиа.
+// Builds the client-facing project shape: adds URLs to media.
 function toClient(p) {
   const base = `/media/projects/${p.id}`
   const video = p.video
@@ -82,7 +82,7 @@ function toClient(p) {
   }
 }
 
-// Валидирует список вырезов [{start,end}] в секундах (end>start).
+// Validates the list of cuts [{start,end}] in seconds (end>start).
 function sanitizeCuts(arr) {
   if (!Array.isArray(arr)) return []
   return arr
@@ -90,7 +90,7 @@ function sanitizeCuts(arr) {
     .filter((c) => Number.isFinite(c.start) && Number.isFinite(c.end) && c.end > c.start)
 }
 
-// Валидирует объект кропа {x,y,w,h} в долях 0..1; иначе — null (полный кадр).
+// Validates a crop object {x,y,w,h} in fractions 0..1; otherwise null (full frame).
 function sanitizeCrop(c) {
   if (!c || typeof c !== 'object') return null
   const n = (v) => Math.max(0, Math.min(1, Number(v)))
@@ -102,7 +102,7 @@ function sanitizeCrop(c) {
   return { x, y, w, h }
 }
 
-// Обёртка обработчика: единый формат ошибок.
+// Handler wrapper: uniform error format.
 const h = (fn) => async (req, res) => {
   try {
     await fn(req, res)
@@ -112,17 +112,17 @@ const h = (fn) => async (req, res) => {
   }
 }
 
-// Загружает проект или отвечает 404.
+// Loads a project or responds 404.
 async function requireProject(id) {
   if (!(await store.exists(id))) {
-    const e = new Error('Проект не найден')
+    const e = new Error('Project not found')
     e.status = 404
     throw e
   }
   return store.read(id)
 }
 
-// --- Проекты: список / создание / чтение / сохранение / удаление ------------
+// --- Projects: list / create / read / save / delete ------------------------
 app.get('/api/projects', h(async (_req, res) => {
   res.json(await store.list())
 }))
@@ -137,7 +137,7 @@ app.get('/api/projects/:id', h(async (req, res) => {
   res.json(toClient(p))
 }))
 
-// Автосохранение состояния таймлайна (имя и/или клипы).
+// Autosave of timeline state (name and/or clips, crop, cuts).
 app.patch('/api/projects/:id', h(async (req, res) => {
   const p = await requireProject(req.params.id)
   if (typeof req.body?.name === 'string') p.name = req.body.name.trim() || p.name
@@ -162,15 +162,15 @@ app.delete('/api/projects/:id', h(async (req, res) => {
   res.json({ ok: true })
 }))
 
-// --- Загрузка видео в проект: probe + кадры --------------------------------
+// --- Upload video to a project: probe + frames -----------------------------
 app.post('/api/projects/:id/video', upload.single('file'), h(async (req, res) => {
   const p = await requireProject(req.params.id)
-  if (!req.file) return res.status(400).json({ error: 'Файл не получен' })
+  if (!req.file) return res.status(400).json({ error: 'No file received' })
 
   const ext = (path.extname(req.file.originalname) || '.mp4').slice(1).toLowerCase()
   const dest = store.sub(p.id, `video.${ext}`)
 
-  // Чистим прежнее видео и оба набора кадров, если пересобираем другим файлом.
+  // Clear the previous video and both frame sets if rebuilding with another file.
   for (const old of await readdir(store.dir(p.id))) {
     if (old.startsWith('video.')) await unlink(store.sub(p.id, old)).catch(() => {})
   }
@@ -183,8 +183,8 @@ app.post('/api/projects/:id/video', upload.single('file'), h(async (req, res) =>
 
   await moveFile(req.file.path, dest)
   const meta = await probe(dest)
-  if (!meta.hasVideo) return res.status(400).json({ error: 'В файле нет видеодорожки' })
-  // Мелкие превью — для таймлайна; крупные keyframes — для анализа Claude Code.
+  if (!meta.hasVideo) return res.status(400).json({ error: 'The file has no video track' })
+  // Small previews — for the timeline; large keyframes — for Claude Code analysis.
   const frames = await extractFrames(dest, framesDir, meta.duration, THUMB)
   const keyframes = await extractFrames(dest, keyDir, meta.duration, KEYFRAME)
 
@@ -199,16 +199,16 @@ app.post('/api/projects/:id/video', upload.single('file'), h(async (req, res) =>
     frames,
     keyframes,
   }
-  p.crop = null // новый файл — сбрасываем прежнюю рамку кропа
-  p.cuts = [] // и прежние вырезы
+  p.crop = null // new file — reset the previous crop frame
+  p.cuts = [] // and the previous cuts
   await store.write(p)
   res.json(toClient(p).video)
 }))
 
-// --- Загрузка аудио-ассета в проект ----------------------------------------
+// --- Upload an audio asset to a project ------------------------------------
 app.post('/api/projects/:id/audio', upload.single('file'), h(async (req, res) => {
   const p = await requireProject(req.params.id)
-  if (!req.file) return res.status(400).json({ error: 'Файл не получен' })
+  if (!req.file) return res.status(400).json({ error: 'No file received' })
 
   const audioId = crypto.randomUUID()
   const ext = (path.extname(req.file.originalname) || '.mp3').slice(1).toLowerCase()
@@ -216,7 +216,7 @@ app.post('/api/projects/:id/audio', upload.single('file'), h(async (req, res) =>
   await moveFile(req.file.path, dest)
 
   const meta = await probe(dest)
-  if (!meta.hasAudio) return res.status(400).json({ error: 'В файле нет аудиодорожки' })
+  if (!meta.hasAudio) return res.status(400).json({ error: 'The file has no audio track' })
 
   p.audios = p.audios || {}
   p.audios[audioId] = { name: req.file.originalname, duration: meta.duration, ext }
@@ -229,14 +229,14 @@ app.post('/api/projects/:id/audio', upload.single('file'), h(async (req, res) =>
   })
 }))
 
-// --- План озвучки: JSON с кадрами (абсолютные пути) для Claude Code ---------
-// Пользователь копирует это в буфер и вставляет в Claude Code — тот открывает
-// кадры по путям и возвращает озвучку сегментами {start,end,text}.
+// --- Voiceover plan: JSON with frames (absolute paths) for Claude Code ------
+// The user copies this to the clipboard and pastes it into Claude Code, which
+// opens the frames by path and returns the voiceover as segments {start,end,text}.
 app.get('/api/projects/:id/voiceover-plan', h(async (req, res) => {
   const p = await requireProject(req.params.id)
-  if (!p.video) return res.status(400).json({ error: 'В проекте нет видео' })
+  if (!p.video) return res.status(400).json({ error: 'The project has no video' })
 
-  // Для анализа отдаём КРУПНЫЕ keyframes; на старых проектах их нет — fallback на превью.
+  // For analysis we serve the LARGE keyframes; old projects lack them — fall back to previews.
   const useKey = Array.isArray(p.video.keyframes) && p.video.keyframes.length > 0
   const list = useKey ? p.video.keyframes : p.video.frames || []
   const framesDir = store.sub(p.id, useKey ? 'keyframes' : 'frames')
@@ -247,15 +247,16 @@ app.get('/api/projects/:id/voiceover-plan', h(async (req, res) => {
 
   const plan = {
     instructions:
-      'Ниже кадры видео с таймингами (t — секунда кадра) и абсолютные пути к JPG на диске. ' +
-      'Открой кадры (прочитай файлы по path), пойми, что происходит в видео, и напиши закадровую ' +
-      'озвучку НА РУССКОМ, разбитую на короткие сегменты. Верни ТОЛЬКО JSON-массив вида ' +
-      '[{"start": число_сек, "end": число_сек, "text": "реплика"}]. Правила: ' +
-      '(1) короткие фрагменты по 1–2 предложения — их удобно править и озвучивать по отдельности; ' +
-      '(2) привязывай start/end к содержимому кадров, чтобы речь совпадала с картинкой; ' +
-      '(3) НЕ выдавай один длинный монолит; (4) укладывай текст по длительности (end−start) — ' +
-      'ориентир ~2–3 слова в секунду; (5) оставляй паузы, где по видео уместно. ' +
-      'Пользователь озвучит каждый сегмент отдельно (mp3) и поставит его на таймлайн в позицию start.',
+      'Below are video frames with timings (t — the frame\'s second) and absolute paths to JPGs on disk. ' +
+      'Open the frames (read the files at each path), understand what happens in the video, and write ' +
+      'voiceover narration split into short segments. Return ONLY a JSON array of the form ' +
+      '[{"start": seconds, "end": seconds, "text": "line"}]. Rules: ' +
+      '(1) short fragments of 1–2 sentences — easy to edit and voice separately; ' +
+      '(2) tie start/end to the frame content so speech matches the picture; ' +
+      '(3) do NOT return one long monolithic block; (4) fit the text to the duration (end−start) — ' +
+      'about 2–3 words per second; (5) leave pauses where appropriate. ' +
+      'Write in the language of the video (or the language the user asked for). ' +
+      'The user will voice each segment separately (as an mp3) and place it on the timeline at its start.',
     project: p.name,
     video: {
       name: p.video.name,
@@ -272,19 +273,19 @@ app.get('/api/projects/:id/voiceover-plan', h(async (req, res) => {
       duration: c.duration,
     })),
     responseExample: [
-      { start: 0, end: 3.5, text: 'Пример первого короткого фрагмента.' },
-      { start: 4, end: 7, text: 'Пример второго фрагмента после небольшой паузы.' },
+      { start: 0, end: 3.5, text: 'Example of the first short fragment.' },
+      { start: 4, end: 7, text: 'Example of the second fragment after a short pause.' },
     ],
   }
   res.json(plan)
 }))
 
-// --- Экспорт проекта в mp4 --------------------------------------------------
+// --- Export a project to mp4 -----------------------------------------------
 app.post('/api/projects/:id/export', h(async (req, res) => {
   const p = await requireProject(req.params.id)
-  if (!p.video) return res.status(400).json({ error: 'В проекте нет видео' })
+  if (!p.video) return res.status(400).json({ error: 'The project has no video' })
 
-  // Если клиент прислал свежую расстановку/кроп — сохраняем перед сборкой.
+  // If the client sent a fresh layout/crop/cuts — persist before building.
   if (Array.isArray(req.body?.clips)) {
     p.clips = req.body.clips.map((c) => ({
       clipId: c.clipId,
@@ -329,7 +330,7 @@ app.post('/api/projects/:id/export', h(async (req, res) => {
   })
 }))
 
-// В production отдаём собранный фронтенд из dist.
+// In production, serve the built frontend from dist.
 if (process.env.NODE_ENV === 'production') {
   const dist = path.join(ROOT, 'dist')
   app.use(express.static(dist))
@@ -337,5 +338,5 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.listen(PORT, () => {
-  console.log(`▶ video_montage backend: http://localhost:${PORT}`)
+  console.log(`▶ video-montage backend: http://localhost:${PORT}`)
 })

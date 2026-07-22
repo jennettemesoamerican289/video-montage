@@ -20,7 +20,7 @@ const TRACK_LABEL_W = 72
 const VIDEO_TRACK_H = 90
 const AUDIO_TRACK_H = 64
 
-// Шаг делений линейки: наименьший «круглый», при котором метки не слипаются.
+// Ruler step: the smallest "round" value at which labels don't overlap.
 const STEPS = [1, 2, 5, 10, 15, 30, 60, 120, 300, 600]
 function chooseStep(pxPerSec: number): number {
   for (const s of STEPS) if (s * pxPerSec >= 64) return s
@@ -30,7 +30,7 @@ function chooseStep(pxPerSec: number): number {
 function fmtTick(sec: number): string {
   const m = Math.floor(sec / 60)
   const s = Math.floor(sec % 60)
-  return m > 0 ? `${m}:${String(s).padStart(2, '0')}` : `${s}с`
+  return m > 0 ? `${m}:${String(s).padStart(2, '0')}` : `${s}s`
 }
 
 export default function Timeline({
@@ -48,7 +48,7 @@ export default function Timeline({
   onDropAudio,
 }: Props) {
   const [dragOver, setDragOver] = useState(false)
-  // Рисование выреза по видео-дорожке в режиме вырезки.
+  // Drawing a cut across the video track in cut mode.
   const [draw, setDraw] = useState<{ from: number; to: number } | null>(null)
   const contentRef = useRef<HTMLDivElement | null>(null)
   const audioTrackRef = useRef<HTMLDivElement | null>(null)
@@ -57,7 +57,7 @@ export default function Timeline({
   const contentW = Math.max(320, video.duration * pxPerSec + 40)
   const step = chooseStep(pxPerSec)
 
-  // Время в секундах по X-координате указателя (относительно контента).
+  // Time in seconds from the pointer's X coordinate (relative to content).
   const timeAt = (clientX: number) => {
     const el = contentRef.current
     if (!el) return 0
@@ -66,7 +66,7 @@ export default function Timeline({
   }
   const seekAt = (clientX: number) => onSeek(timeAt(clientX))
 
-  // --- Вырезка: тянем по видео-дорожке, чтобы отметить фрагмент на удаление ---
+  // --- Cutting: drag across the video track to mark a segment for removal ---
   const onCutDown = (e: React.PointerEvent) => {
     if (!cutMode) return
     e.preventDefault()
@@ -85,10 +85,10 @@ export default function Timeline({
     const b = Math.max(draw.from, draw.to)
     setDraw(null)
     if (b - a >= 0.05) onAddCut(a, b)
-    else onSeek(a) // короткий клик — просто перемотка
+    else onSeek(a) // short click — just seek
   }
 
-  // Перетаскивание аудио-клипа по времени.
+  // Dragging an audio clip along time.
   const onClipPointerDown = (e: React.PointerEvent, clip: AudioClip) => {
     e.stopPropagation()
     ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
@@ -114,13 +114,13 @@ export default function Timeline({
     <div className="timeline">
       <div className="tl-gutter" style={{ width: TRACK_LABEL_W }}>
         <div className="tl-ruler-label" />
-        <div className="tl-track-label" style={{ height: VIDEO_TRACK_H }}>Видео</div>
-        <div className="tl-track-label" style={{ height: AUDIO_TRACK_H }}>Аудио</div>
+        <div className="tl-track-label" style={{ height: VIDEO_TRACK_H }}>Video</div>
+        <div className="tl-track-label" style={{ height: AUDIO_TRACK_H }}>Audio</div>
       </div>
 
       <div className="tl-scroll">
         <div className="tl-content" ref={contentRef} style={{ width: contentW }}>
-          {/* Линейка времени */}
+          {/* Time ruler */}
           <div className="ruler" onClick={(e) => seekAt(e.clientX)}>
             {ticks.map((t) => (
               <div key={t} className="tick" style={{ left: t * pxPerSec }}>
@@ -129,7 +129,7 @@ export default function Timeline({
             ))}
           </div>
 
-          {/* Дорожка видео: кадры-превью + вырезы (в cutMode — рисование) */}
+          {/* Video track: preview frames + cuts (drawing in cut mode) */}
           <div
             className={`track video-track ${cutMode ? 'cutting' : ''}`}
             style={{ height: VIDEO_TRACK_H }}
@@ -148,13 +148,13 @@ export default function Timeline({
                 style={{ left: f.t * pxPerSec, height: VIDEO_TRACK_H }}
               />
             ))}
-            {/* сохранённые вырезы */}
+            {/* saved cuts */}
             {cuts.map((c, i) => (
               <div
                 key={i}
                 className="cut-region"
                 style={{ left: c.start * pxPerSec, width: (c.end - c.start) * pxPerSec }}
-                title={`Вырез ${c.start.toFixed(2)}–${c.end.toFixed(2)}с`}
+                title={`Cut ${c.start.toFixed(2)}–${c.end.toFixed(2)}s`}
               >
                 <button
                   className="cut-remove"
@@ -163,13 +163,13 @@ export default function Timeline({
                     e.stopPropagation()
                     onRemoveCut(i)
                   }}
-                  title="Убрать вырез"
+                  title="Remove cut"
                 >
                   ×
                 </button>
               </div>
             ))}
-            {/* временное выделение при рисовании */}
+            {/* live selection while drawing */}
             {draw && (
               <div
                 className="cut-region drawing"
@@ -181,7 +181,7 @@ export default function Timeline({
             )}
           </div>
 
-          {/* Дорожка аудио: перетаскиваемые mp3-клипы + приём drop */}
+          {/* Audio track: draggable mp3 clips + drop target */}
           <div
             ref={audioTrackRef}
             className={`track audio-track ${dragOver ? 'drop' : ''}`}
@@ -210,25 +210,25 @@ export default function Timeline({
                 onPointerDown={(e) => onClipPointerDown(e, c)}
                 onPointerMove={onClipPointerMove}
                 onPointerUp={onClipPointerUp}
-                title={`${c.name} · старт ${c.start.toFixed(2)}с · ${c.duration.toFixed(1)}с`}
+                title={`${c.name} · start ${c.start.toFixed(2)}s · ${c.duration.toFixed(1)}s`}
               >
                 <span className="clip-name">{c.name}</span>
                 <button
                   className="clip-remove"
                   onPointerDown={(e) => e.stopPropagation()}
                   onClick={() => onRemoveClip(c.clipId)}
-                  title="Удалить клип"
+                  title="Remove clip"
                 >
                   ×
                 </button>
               </div>
             ))}
             {clips.length === 0 && (
-              <div className="track-hint">Перетащите сюда mp3 или нажмите «+ аудио»</div>
+              <div className="track-hint">Drop mp3s here or click "+ audio"</div>
             )}
           </div>
 
-          {/* Плейхед поверх всех дорожек */}
+          {/* Playhead over all tracks */}
           <div className="playhead" style={{ left: playheadTime * pxPerSec }} />
         </div>
       </div>

@@ -1,4 +1,4 @@
-// Клиент бэкенда. Все пути идут через vite-прокси на localhost:3001.
+// Backend client. All paths go through the vite proxy to localhost:3001.
 import type {
   Video,
   AudioAsset,
@@ -18,7 +18,7 @@ async function handle<T>(res: Response): Promise<T> {
       const body = await res.json()
       if (body?.error) msg = body.error
     } catch {
-      /* тело не JSON — оставляем статус */
+      /* body is not JSON — keep the status */
     }
     throw new Error(msg)
   }
@@ -39,7 +39,7 @@ async function postFile<T>(url: string, file: File): Promise<T> {
   return handle<T>(await fetch(url, { method: 'POST', body: form }))
 }
 
-// --- Проекты ---------------------------------------------------------------
+// --- Projects --------------------------------------------------------------
 export function listProjects(): Promise<ProjectSummary[]> {
   return json<ProjectSummary[]>('/api/projects', 'GET')
 }
@@ -56,7 +56,7 @@ export function saveProject(
   id: string,
   patch: { name?: string; clips?: AudioClip[]; crop?: Crop | null; cuts?: Cut[] },
 ): Promise<{ ok: boolean; updatedAt: string }> {
-  // Ключ отправляем только если он задан — иначе сервер решит, что поле чистят.
+  // Only send a key if it is set — otherwise the server treats the field as cleared.
   const body: Record<string, unknown> = {}
   if (patch.name !== undefined) body.name = patch.name
   if (patch.clips !== undefined) {
@@ -77,7 +77,7 @@ export function deleteProject(id: string): Promise<{ ok: boolean }> {
   return json(`/api/projects/${id}`, 'DELETE')
 }
 
-// --- Медиа и экспорт (в рамках проекта) ------------------------------------
+// --- Media and export (within a project) -----------------------------------
 export function uploadVideo(projectId: string, file: File): Promise<Video> {
   return postFile<Video>(`/api/projects/${projectId}/video`, file)
 }

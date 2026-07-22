@@ -4,7 +4,7 @@ interface Props {
   onFile: (file: File) => void
 }
 
-// Стартовый экран: большая зона для перетаскивания или выбора видеофайла.
+// Start screen: a large area to drop or pick a video file.
 export default function VideoLoader({ onFile }: Props) {
   const [over, setOver] = useState(false)
 
@@ -25,8 +25,8 @@ export default function VideoLoader({ onFile }: Props) {
         }}
       >
         <div className="dz-icon">🎞️</div>
-        <div className="dz-title">Перетащите видео сюда</div>
-        <div className="dz-sub">или нажмите, чтобы выбрать файл</div>
+        <div className="dz-title">Drop a video here</div>
+        <div className="dz-sub">or click to choose a file</div>
         <input
           type="file"
           accept="video/*"
@@ -35,7 +35,7 @@ export default function VideoLoader({ onFile }: Props) {
         />
       </label>
       <p className="loader-hint">
-        Кадры видео появятся на таймлайне. Дальше можно добавить mp3 и расставить озвучку.
+        Video frames will appear on the timeline. Then you can add mp3s and lay out the voiceover.
       </p>
     </div>
   )

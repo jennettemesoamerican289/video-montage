@@ -16,7 +16,7 @@ interface Props {
   onImport: (files: File[], starts: number[], replace: boolean) => void
 }
 
-// Разбирает JSON от Claude Code: массив [{start,end,text}] либо { segments: [...] }.
+// Parses JSON from Claude Code: an array [{start,end,text}] or { segments: [...] }.
 function parseSegments(text: string): Segment[] | null {
   const t = text.trim()
   if (!t) return null
@@ -37,7 +37,7 @@ function parseSegments(text: string): Segment[] | null {
   }
 }
 
-// Сопоставляет файл с сегментом по первому числу в имени: 12.mp3 → segments[12].
+// Matches a file to a segment by the first number in its name: 12.mp3 → segments[12].
 function matchFiles(files: File[], segments: Segment[] | null): Match[] {
   return files.map((f) => {
     const m = f.name.match(/\d+/)
@@ -69,13 +69,13 @@ export default function ImportDialog({ onClose, onImport }: Props) {
     <div className="overlay" onClick={onClose}>
       <div className="modal hud-panel" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
-          <div className="hud-title">Импорт озвучки по таймингам</div>
+          <div className="hud-title">Import voiceover by timings</div>
           <button className="btn ghost btn-x" onClick={onClose}>✕</button>
         </div>
 
         <p className="modal-hint muted">
-          Вставьте JSON-сегменты от Claude Code (<span className="mono">[{'{'}start, end, text{'}'}, …]</span>)
-          и выберите mp3, названные по номеру сегмента: <span className="mono">0.mp3, 1.mp3 …</span>
+          Paste JSON segments from Claude Code (<span className="mono">[{'{'}start, end, text{'}'}, …]</span>)
+          and choose mp3s named by segment number: <span className="mono">0.mp3, 1.mp3 …</span>
         </p>
 
         <textarea
@@ -87,10 +87,10 @@ export default function ImportDialog({ onClose, onImport }: Props) {
 
         <div className="import-row">
           <span className={`tag ${segments ? 'ok' : 'off'}`}>
-            {segments ? `Сегментов: ${segments.length}` : 'JSON не распознан'}
+            {segments ? `Segments: ${segments.length}` : 'JSON not recognized'}
           </span>
           <label className="btn">
-            Выбрать mp3
+            Choose mp3s
             <input
               type="file"
               accept="audio/*"
@@ -99,8 +99,8 @@ export default function ImportDialog({ onClose, onImport }: Props) {
               onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
             />
           </label>
-          <span className="tag">Файлов: {files.length}</span>
-          <span className={`tag ${usable.length ? 'ok' : 'off'}`}>Сопоставлено: {usable.length}</span>
+          <span className="tag">Files: {files.length}</span>
+          <span className={`tag ${usable.length ? 'ok' : 'off'}`}>Matched: {usable.length}</span>
         </div>
 
         {files.length > 0 && (
@@ -112,7 +112,7 @@ export default function ImportDialog({ onClose, onImport }: Props) {
                 {m.start != null ? (
                   <span className="mono ok">{fmt(m.start)}</span>
                 ) : (
-                  <span className="mono off">нет сегмента #{m.idx ?? '?'}</span>
+                  <span className="mono off">no segment #{m.idx ?? '?'}</span>
                 )}
               </div>
             ))}
@@ -121,13 +121,13 @@ export default function ImportDialog({ onClose, onImport }: Props) {
 
         <label className="import-check">
           <input type="checkbox" checked={replace} onChange={(e) => setReplace(e.target.checked)} />
-          Заменить текущие клипы на дорожке
+          Replace current clips on the track
         </label>
 
         <div className="modal-foot">
-          <button className="btn ghost" onClick={onClose}>Отмена</button>
+          <button className="btn ghost" onClick={onClose}>Cancel</button>
           <button className="btn primary" disabled={usable.length === 0} onClick={doImport}>
-            Импортировать{usable.length ? ` (${usable.length})` : ''}
+            Import{usable.length ? ` (${usable.length})` : ''}
           </button>
         </div>
       </div>

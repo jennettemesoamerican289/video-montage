@@ -1,11 +1,11 @@
-// Хранилище проектов на диске. Каждый проект — самодостаточная папка
-// data/projects/<id>/ с project.json (источник истины) и медиа внутри:
-//   project.json          — метаданные, аудио-ассеты, расстановка клипов
-//   video.<ext>           — исходное видео (если загружено)
-//   frames/frame-XXXX.jpg — кадры-превью
-//   audio/<audioId>.<ext> — загруженные mp3
-//   exports/<exportId>.mp4 — результаты сборки
-// Благодаря этому состояние работы переживает перезапуск сервера.
+// On-disk project store. Each project is a self-contained folder
+// data/projects/<id>/ with project.json (source of truth) and media inside:
+//   project.json          — metadata, audio assets, clip layout
+//   video.<ext>           — source video (if uploaded)
+//   frames/frame-XXXX.jpg — preview frames
+//   audio/<audioId>.<ext> — uploaded mp3s
+//   exports/<exportId>.mp4 — export results
+// Thanks to this, work state survives a server restart.
 import { mkdir, readFile, writeFile, readdir, rm, stat } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { randomUUID } from 'node:crypto'
@@ -43,7 +43,7 @@ export function createProjectStore(dataRoot) {
     const now = new Date().toISOString()
     const project = {
       id,
-      name: (name && String(name).trim()) || 'Без названия',
+      name: (name && String(name).trim()) || 'Untitled',
       createdAt: now,
       updatedAt: now,
       video: null,
@@ -69,10 +69,10 @@ export function createProjectStore(dataRoot) {
           clipCount: (p.clips || []).length,
         })
       } catch {
-        /* не проект — пропускаем */
+        /* not a project — skip */
       }
     }
-    // Новые/недавно менявшиеся — вверху.
+    // Newest / most-recently-changed first.
     out.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
     return out
   }
@@ -93,10 +93,10 @@ export function createProjectStore(dataRoot) {
   return { root, dir, sub, read, write, create, list, remove, exists }
 }
 
-// Пропускаем только валидный uuid — защита от path traversal в :id.
+// Only allow a valid uuid — guards against path traversal in :id.
 function safeId(id) {
   if (typeof id !== 'string' || !/^[a-f0-9-]{36}$/i.test(id)) {
-    throw new Error(`Некорректный id проекта: ${id}`)
+    throw new Error(`Invalid project id: ${id}`)
   }
   return id
 }

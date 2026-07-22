@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import type { AudioClip, Cut } from './types'
 
-// Синхронное превью: видео — мастер-часы, аудио-клипы играют в своих окнах
-// [start, start+duration]. На каждом кадре rAF сверяем время видео и
-// запускаем/останавливаем/ресинхроним каждый <audio>. Звук самого видео
-// (если есть) микшируется браузером автоматически — получаем предпросмотр
-// итогового ролика ещё до сборки mp4.
+// Synced preview: the video is the master clock, audio clips play in their windows
+// [start, start+duration]. On each rAF frame we check the video time and
+// start/stop/resync each <audio>. The video's own sound (if any) is mixed by the
+// browser automatically — giving a preview of the final clip before the mp4 export.
 export interface Transport {
   playing: boolean
   time: number
@@ -15,7 +14,7 @@ export interface Transport {
   seek: (t: number) => void
 }
 
-const RESYNC_THRESHOLD = 0.28 // сек рассинхрона, после которого правим currentTime
+const RESYNC_THRESHOLD = 0.28 // seconds of drift after which we fix currentTime
 
 export function useTransport(
   videoRef: RefObject<HTMLVideoElement | null>,
@@ -30,7 +29,7 @@ export function useTransport(
   const cutsRef = useRef(cuts)
   cutsRef.current = cuts
 
-  // Держим пул <audio> в соответствии со списком клипов.
+  // Keep the <audio> pool in sync with the clip list.
   useEffect(() => {
     const p = pool.current
     for (const c of clips) {
@@ -48,7 +47,7 @@ export function useTransport(
     }
   }, [clips])
 
-  // Останавливаем всё при размонтировании.
+  // Stop everything on unmount.
   useEffect(() => {
     const p = pool.current
     return () => {
@@ -56,7 +55,7 @@ export function useTransport(
     }
   }, [])
 
-  // Выставляет аудио-клипы в согласованное с моментом t состояние.
+  // Brings audio clips into a state consistent with moment t.
   const syncClipsAt = useCallback((t: number, active: boolean) => {
     for (const c of clipsRef.current) {
       const a = pool.current.get(c.clipId)
@@ -77,14 +76,14 @@ export function useTransport(
     }
   }, [])
 
-  // rAF-петля во время воспроизведения.
+  // rAF loop during playback.
   useEffect(() => {
     if (!playing) return
     let raf = 0
     const loop = () => {
       const v = videoRef.current
       if (v) {
-        // Перепрыгиваем вырезанные фрагменты.
+        // Skip over cut-out segments.
         const cut = cutsRef.current.find((c) => v.currentTime >= c.start && v.currentTime < c.end - 0.02)
         if (cut) v.currentTime = cut.end
         setTime(v.currentTime)
@@ -106,7 +105,7 @@ export function useTransport(
     if (!v) return
     if (v.ended) v.currentTime = 0
     v.play().catch(() => {})
-    // Запускаем клипы текущего окна прямо в user-gesture — разблокирует автоплей аудио.
+    // Start clips of the current window right in the user gesture — unlocks audio autoplay.
     syncClipsAt(v.currentTime, true)
     setPlaying(true)
   }, [videoRef, syncClipsAt])

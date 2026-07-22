@@ -5,7 +5,7 @@ import './styles.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    {/* Глубокий космический HUD-фон: туманности + Tron-сетка (за контентом). */}
+    {/* Deep-space HUD background: nebulae + Tron grid (behind content). */}
     <div className="holo-env" aria-hidden>
       <div className="holo-blob b1" />
       <div className="holo-blob b2" />

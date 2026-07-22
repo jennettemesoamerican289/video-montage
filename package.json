@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Локальный видеоредактор: кадры видео на таймлайне, расстановка mp3-озвучки, кроп, вырезка, синхронное превью и сборка в mp4 через ffmpeg.",
+  "description": "Local video editor: video frames on a timeline, mp3 voiceover, crop, cut, synced preview, and mp4 export via ffmpeg.",
   "license": "GPL-3.0-or-later",
   "author": "Vladimir Miroshnichenko <vov.mir28@gmail.com>",
   "repository": {

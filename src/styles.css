@@ -1,7 +1,7 @@
 /* =============================================================================
-   Video Montage — Holographic HUD skin (по мотивам gitmir Design System)
-   Near-black navy + nebula + Tron grid, острая геометрия (0 скруглений),
-   cyan-акцент, glass-панели с угловыми скобками, Onest + JetBrains Mono.
+   Video Montage — Holographic HUD skin (inspired by the gitmir Design System)
+   Near-black navy + nebula + Tron grid, sharp geometry (0 rounding),
+   cyan accent, glass panels with corner brackets, Onest + JetBrains Mono.
    ========================================================================== */
 
 :root {
@@ -19,7 +19,7 @@
   --cyan-soft: #8aecff;
   --cyan-deep: #11a9e6;
   --blue: #4ea8ff;
-  --teal: #19e3c2;   /* аудио-клипы */
+  --teal: #19e3c2;   /* audio clips */
   --amber: #ffb86b;
   --gold: #ffd34c;
   --green: #34f0a6;
@@ -91,8 +91,8 @@ input, textarea, select { font-family: inherit; }
 .holo-blob.b2 { width: 560px; height: 560px; right: -170px; top: 6%; background: radial-gradient(circle, rgba(78,168,255,.28), transparent 70%); }
 
 /* ------------------------- Glass HUD panel + brackets --------------------- */
-/* Signature: flat navy plate, hairline cyan border, 4 светящихся L-скобки
-   + светящаяся верхняя грань (всё в одном псевдоэлементе). */
+/* Signature: flat navy plate, hairline cyan border, 4 glowing L-brackets
+   + a glowing top edge (all in one pseudo-element). */
 .hud-panel {
   position: relative;
   isolation: isolate;
@@ -344,7 +344,7 @@ input, textarea, select { font-family: inherit; }
 
 /* ================================ Editor ================================ */
 .editor { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; min-height: 0; }
-/* видео занимает всё свободное место сверху */
+/* video takes all free space at the top */
 .preview {
   position: relative;
   flex: 1;
@@ -354,7 +354,7 @@ input, textarea, select { font-family: inherit; }
   justify-content: center;
   padding: 16px;
 }
-/* сцена обтягивает видео и служит offsetParent для рамки кропа */
+/* the stage wraps the video and is the offsetParent for the crop frame */
 .stage {
   position: relative;
   display: flex;
@@ -362,10 +362,10 @@ input, textarea, select { font-family: inherit; }
   max-height: 100%;
   background: #000;
 }
-/* нижний док — транспорт + таймлайн + экспорт, прибит к низу окна */
+/* bottom dock — transport + timeline + export, pinned to the window bottom */
 .dock { flex: 0 0 auto; display: flex; flex-direction: column; }
 
-/* панель воспроизведения под видео */
+/* playback bar below the video */
 .transport {
   display: flex;
   align-items: center;
@@ -408,7 +408,7 @@ input, textarea, select { font-family: inherit; }
   background: #000;
   border: none;
 }
-/* мета-подпись поверх видео (HUD-чип, не занимает layout) */
+/* meta caption over the video (HUD chip, does not take layout space) */
 .meta {
   position: absolute;
   top: 22px;
@@ -426,8 +426,8 @@ input, textarea, select { font-family: inherit; }
 .meta strong { color: #fff; font-weight: 600; font-size: 12.5px; }
 .meta span { font-family: var(--font-mono); font-size: 11px; color: var(--cyan-soft); }
 
-/* ------------------------------- Кроп видео ------------------------------ */
-/* left/top/width/height задаются инлайн из измеренного прямоугольника кадра */
+/* ------------------------------- Video crop ------------------------------ */
+/* left/top/width/height are set inline from the measured frame rectangle */
 .crop-overlay { position: absolute; z-index: 3; overflow: hidden; touch-action: none; }
 .crop-rect {
   position: absolute;
@@ -436,7 +436,7 @@ input, textarea, select { font-family: inherit; }
   box-shadow: 0 0 0 100vmax rgba(3, 7, 15, 0.62);
   cursor: move;
 }
-/* тонкая сетка-«трети» внутри рамки */
+/* thin rule-of-thirds grid inside the frame */
 .crop-rect::before {
   content: "";
   position: absolute;
@@ -514,7 +514,7 @@ input, textarea, select { font-family: inherit; }
   object-fit: cover;
   filter: saturate(1.05) brightness(0.96);
 }
-/* вырезанный фрагмент видео */
+/* cut-out video segment */
 .cut-region {
   position: absolute;
   top: 0;
@@ -554,7 +554,7 @@ input, textarea, select { font-family: inherit; }
   pointer-events: none;
 }
 
-/* аудио-клип — острый HUD-блок, teal-акцент со свечением */
+/* audio clip — sharp HUD block, teal accent with glow */
 .clip {
   position: absolute;
   top: 6px;
@@ -588,7 +588,7 @@ input, textarea, select { font-family: inherit; }
 }
 .clip-remove:hover { background: var(--danger); color: #fff; }
 
-/* плейхед — яркая cyan-линия со свечением */
+/* playhead — bright glowing cyan line */
 .playhead {
   position: absolute;
   top: 0;
@@ -625,7 +625,7 @@ input, textarea, select { font-family: inherit; }
 .export-info { color: var(--ink-2); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.02em; }
 .export-info strong { color: var(--cyan-soft); }
 
-/* ============================ Модалка импорта =========================== */
+/* ============================ Import modal ============================= */
 .overlay {
   position: fixed;
   inset: 0;

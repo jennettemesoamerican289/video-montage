@@ -1,8 +1,8 @@
-// Общие типы данных редактора (совпадают с ответами бэкенда).
+// Shared editor data types (match the backend responses).
 
 export interface Frame {
   url: string
-  t: number // момент кадра в секундах
+  t: number // frame moment in seconds
 }
 
 export interface Video {
@@ -23,14 +23,14 @@ export interface AudioAsset {
   url: string
 }
 
-// Экземпляр аудио-клипа, размещённый на таймлайне.
+// An audio clip instance placed on the timeline.
 export interface AudioClip {
-  clipId: string // локальный id инстанса (одно аудио можно положить несколько раз)
+  clipId: string // local instance id (one audio can be placed multiple times)
   audioId: string
   name: string
   duration: number
   url?: string
-  start: number // позиция начала на таймлайне, секунды
+  start: number // start position on the timeline, seconds
 }
 
 export interface ExportResult {
@@ -39,7 +39,7 @@ export interface ExportResult {
   name: string
 }
 
-// Краткая карточка проекта для списка.
+// Short project card for the list.
 export interface ProjectSummary {
   id: string
   name: string
@@ -49,7 +49,7 @@ export interface ProjectSummary {
   clipCount: number
 }
 
-// План озвучки для Claude Code: кадры с путями на диске + подсказка.
+// Voiceover plan for Claude Code: frames with on-disk paths + a prompt.
 export interface VoiceoverPlan {
   instructions: string
   project: string
@@ -66,7 +66,7 @@ export interface VoiceoverPlan {
   responseExample: { start: number; end: number; text: string }[]
 }
 
-// Прямоугольник кропа в долях (0..1) от размеров кадра. null = полный кадр.
+// Crop rectangle in fractions (0..1) of the frame size. null = full frame.
 export interface Crop {
   x: number
   y: number
@@ -74,13 +74,13 @@ export interface Crop {
   h: number
 }
 
-// Вырезанный по времени фрагмент видео (секунды исходного таймлайна).
+// A time-based cut-out segment of the video (seconds of the original timeline).
 export interface Cut {
   start: number
   end: number
 }
 
-// Полное состояние проекта.
+// Full project state.
 export interface Project {
   id: string
   name: string

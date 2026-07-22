@@ -1,6 +1,6 @@
-// Тонкие обёртки над ffmpeg/ffprobe (self-contained бинарники из npm).
-// Всё вызывается через spawn — команды строим явно, чтобы полностью
-// контролировать filter_complex при сборке.
+// Thin wrappers around ffmpeg/ffprobe (self-contained binaries from npm).
+// Everything runs via spawn — commands are built explicitly so we fully
+// control filter_complex during export.
 import { spawn } from 'node:child_process'
 import { readdir } from 'node:fs/promises'
 import path from 'node:path'
@@ -9,13 +9,13 @@ import ffprobeStatic from 'ffprobe-static'
 
 const ffprobePath = ffprobeStatic.path
 
-// Мелкие превью для полосы таймлайна (высота, потолок числа кадров).
+// Small previews for the timeline strip (height, cap on frame count).
 export const THUMB = { height: 90, maxFrames: 400, quality: 5, prefix: 'frame' }
-// Крупные кадры для анализа Claude Code: читаемое разрешение, но реже по времени,
-// чтобы не плодить сотни картинок и не жечь токены при просмотре.
+// Large frames for Claude Code analysis: readable resolution but sparser in time,
+// so we don't produce hundreds of images or burn tokens when reviewing them.
 export const KEYFRAME = { height: 720, maxFrames: 60, quality: 2, prefix: 'key' }
 
-// Запуск процесса с накоплением stderr для внятной ошибки.
+// Runs a process, collecting stderr for a clear error.
 function run(bin, args) {
   return new Promise((resolve, reject) => {
     const proc = spawn(bin, args)
@@ -31,7 +31,7 @@ function run(bin, args) {
   })
 }
 
-// r_frame_rate приходит дробью вида "30000/1001" — превращаем в число.
+// r_frame_rate comes as a fraction like "30000/1001" — turn it into a number.
 function parseFps(raw) {
   if (!raw || raw === '0/0') return null
   const [num, den] = raw.split('/').map(Number)
@@ -39,7 +39,7 @@ function parseFps(raw) {
   return +(num / den).toFixed(3)
 }
 
-// Метаданные медиа-файла: длительность, размеры, fps.
+// Media file metadata: duration, dimensions, fps.
 export async function probe(file) {
   const args = [
     '-v', 'error',
@@ -64,13 +64,13 @@ export async function probe(file) {
   }
 }
 
-// Раскладываем видео на кадры JPG в outDir. Интервал подбираем так, чтобы кадров
-// было не больше spec.maxFrames. scale не апскейлит мелкие видео (min с ih).
-// Возвращаем список { file, t }, где t — момент кадра в секундах.
+// Extracts video frames as JPGs into outDir. The interval is chosen so there are
+// no more than spec.maxFrames frames. scale does not upscale small videos (min with ih).
+// Returns a list of { file, t }, where t is the frame's moment in seconds.
 export async function extractFrames(file, outDir, duration, spec = THUMB) {
-  const interval = Math.max(1, Math.ceil(duration / spec.maxFrames)) // секунд между кадрами
+  const interval = Math.max(1, Math.ceil(duration / spec.maxFrames)) // seconds between frames
   const fps = 1 / interval
-  // Запятую внутри выражения min() экранируем — иначе это разделитель фильтров.
+  // Escape the comma inside min() — otherwise it splits filters.
   const scale = `scale=-2:min(${spec.height}\\,ih)`
   const args = [
     '-hide_banner', '-loglevel', 'error',
@@ -87,8 +87,8 @@ export async function extractFrames(file, outDir, duration, spec = THUMB) {
   return names.map((name, i) => ({ file: name, t: i * interval }))
 }
 
-// Переводит кроп в долях (0..1) в пиксельный фильтр ffmpeg crop=w:h:x:y.
-// Размеры округляются до чётных (требование yuv420) и зажимаются в кадр.
+// Turns a crop in fractions (0..1) into the pixel filter ffmpeg crop=w:h:x:y.
+// Dimensions are rounded to even (yuv420 requirement) and clamped to the frame.
 function cropFilter(crop, width, height) {
   if (!crop || !width || !height) return null
   const even = (n) => Math.max(2, Math.round(n / 2) * 2)
@@ -100,12 +100,12 @@ function cropFilter(crop, width, height) {
   let cy = Math.round(crop.y * height)
   cx = Math.max(0, Math.min(cx, width - cw))
   cy = Math.max(0, Math.min(cy, height - ch))
-  // Полный кадр — фильтр не нужен.
+  // Full frame — no filter needed.
   if (cw >= even(width) && ch >= even(height) && cx === 0 && cy === 0) return null
   return `crop=${cw}:${ch}:${cx}:${cy}`
 }
 
-// Нормализует вырезы: отбрасывает пустые, сортирует, склеивает пересечения.
+// Normalizes cuts: drops empty ones, sorts, merges overlaps.
 function mergeCuts(cuts, duration) {
   const sorted = (cuts || [])
     .map((c) => ({ start: Math.max(0, Number(c.start)), end: Math.min(duration, Number(c.end)) }))
@@ -120,7 +120,7 @@ function mergeCuts(cuts, duration) {
   return merged
 }
 
-// Инвертирует вырезы в keep-сегменты (что остаётся в видео).
+// Inverts cuts into keep-segments (what remains in the video).
 function keepSegments(merged, duration) {
   const keep = []
   let pos = 0
@@ -132,8 +132,8 @@ function keepSegments(merged, duration) {
   return keep
 }
 
-// Пересчитывает момент t после вырезов: сдвиг влево на суммарную длину
-// вырезов до t. Если t попал внутрь выреза — возвращает null (клип выпадает).
+// Remaps a moment t after cuts: shift left by the total length of cuts before t.
+// If t falls inside a cut — returns null (the clip is dropped).
 function shiftTime(t, merged) {
   let removed = 0
   for (const c of merged) {
@@ -143,11 +143,11 @@ function shiftTime(t, merged) {
   return t - removed
 }
 
-// Сборка финального mp4: (опц.) вырезы по времени + кроп + микс аудио-клипов.
-// clips: [{ file: absPath, start: seconds }] в координатах ИСХОДНОГО видео.
+// Builds the final mp4: (optional) time cuts + crop + mix of audio clips.
+// clips: [{ file: absPath, start: seconds }] in the ORIGINAL video's coordinates.
 // opts: { crop?, width, height, duration, cuts? }.
-// При вырезах видео режется на keep-сегменты (trim+concat), а старты клипов
-// ремапятся; клипы внутри вырезов выпадают. Длина вывода ограничивается -t.
+// With cuts the video is sliced into keep-segments (trim+concat), and clip starts
+// are remapped; clips inside cuts are dropped. Output length is bounded by -t.
 export async function buildExport(videoPath, clips, outPath, opts = {}) {
   const { crop, width, height, duration } = opts
   const merged = duration ? mergeCuts(opts.cuts, duration) : []
@@ -158,7 +158,7 @@ export async function buildExport(videoPath, clips, outPath, opts = {}) {
 
   const filters = []
 
-  // --- Видео-ветка: вырезы (trim+concat) → кроп ---
+  // --- Video branch: cuts (trim+concat) → crop ---
   let vLabel = '0:v'
   let outDuration = duration
   if (hasCuts) {
@@ -177,7 +177,7 @@ export async function buildExport(videoPath, clips, outPath, opts = {}) {
     vLabel = '[vout]'
   }
 
-  // --- Аудио-ветка: ремап стартов по вырезам, adelay + amix поверх тишины ---
+  // --- Audio branch: remap starts by cuts, adelay + amix over silence ---
   const remapped = clips
     .map((c, i) => ({ input: i + 1, start: hasCuts ? shiftTime(c.start, merged) : c.start }))
     .filter((c) => c.start != null && c.start >= 0)
@@ -185,7 +185,7 @@ export async function buildExport(videoPath, clips, outPath, opts = {}) {
 
   if (hasAudio) {
     args.push('-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100')
-    const silenceIdx = clips.length + 1 // видео = 0, клипы 1..n, тишина n+1
+    const silenceIdx = clips.length + 1 // video = 0, clips 1..n, silence n+1
     const mixLabels = [`[${silenceIdx}:a]`]
     remapped.forEach((c, i) => {
       const delayMs = Math.max(0, Math.round(c.start * 1000))
@@ -199,11 +199,11 @@ export async function buildExport(videoPath, clips, outPath, opts = {}) {
   args.push('-map', vLabel)
   if (hasAudio) args.push('-map', '[aout]')
 
-  // Всегда перекодируем в H.264/AAC + faststart — mp4 гарантированно играется.
+  // Always re-encode to H.264/AAC + faststart — the mp4 is guaranteed to play.
   args.push('-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p')
   if (hasAudio) {
     args.push('-c:a', 'aac', '-b:a', '192k')
-    // Тишина anullsrc бесконечна — ограничиваем длиной итогового видео.
+    // anullsrc silence is infinite — bound the output to the final video length.
     if (outDuration && outDuration > 0) args.push('-t', String(outDuration))
     else args.push('-shortest')
   }

@@ -4,6 +4,6 @@ data/
 *.log
 .DS_Store
 
-# Локальные артефакты разработки (не для публичного репозитория)
+# Local development artifacts (not for the public repository)
 .claude/
 .gitmir/

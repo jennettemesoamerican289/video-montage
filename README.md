@@ -1,103 +1,104 @@
 # 🎬 Video Montage
 
-Локальный видеоредактор в браузере с голографическим HUD-интерфейсом. Всё
-работает на твоей машине: видео и аудио никуда не загружаются — их обрабатывает
-локальный бэкенд через [ffmpeg](https://ffmpeg.org/).
+A local, in-browser video editor with a holographic HUD interface. Everything runs
+on your machine: video and audio are never uploaded anywhere — they're processed by
+a local backend via [ffmpeg](https://ffmpeg.org/).
 
-Заточен под простой сценарий: **взять видео, наложить озвучку и собрать mp4** —
-с удобной интеграцией с [Claude Code](https://claude.com/claude-code) для
-генерации текстов озвучки прямо по кадрам видео.
+Built for a simple workflow: **take a video, lay a voiceover on top, and export an
+mp4** — with handy [Claude Code](https://claude.com/claude-code) integration that
+generates voiceover text straight from the video frames.
 
-![Интерфейс Video Montage](docs/preview.svg)
+![Video Montage interface](docs/preview.svg)
 
-## Возможности
+## Features
 
-- **Таймлайн с кадрами видео** — ffmpeg раскладывает видео на кадры-превью, видно
-  весь ролик на дорожке.
-- **Озвучка mp3** — перетаскивай аудио на дорожку и двигай по времени; можно
-  выбрать сразу пачку файлов — лягут встык.
-- **Синхронное превью со звуком** — свои кнопки play/pause, видео играет вместе с
-  расставленной озвучкой ещё до сборки.
-- **Кроп кадра** — рамка с ручками поверх видео, обрезает края (для любого
-  соотношения сторон).
-- **Вырезка кусков** — помечаешь ненужные фрагменты, на экспорте они вырезаются, а
-  остальное склеивается; аудио-клипы автоматически сдвигаются.
-- **Проекты** — всё сохраняется на диск и переживает перезапуск; автосохранение.
-- **Сборка в mp4** — H.264/AAC + faststart, гарантированно играется везде.
-- **Интеграция с Claude Code для озвучки** — кнопка копирует JSON с кадрами и
-  таймингами; Claude Code смотрит кадры и возвращает тексты озвучки сегментами
-  `{start, end, text}`; генеришь mp3 в любом TTS и импортируешь по таймингам
-  обратно.
+- **Timeline with video frames** — ffmpeg splits the video into preview frames, so
+  you can see the whole clip on the track.
+- **mp3 voiceover** — drag audio onto the track and move it in time; you can pick a
+  whole batch of files at once and they'll be laid out back-to-back.
+- **Synced preview with sound** — custom play/pause controls; the video plays
+  together with the laid-out voiceover before you even export.
+- **Frame crop** — a handled frame over the video trims the edges (works for any
+  aspect ratio).
+- **Time cuts** — mark the segments you don't need; on export they're cut out and
+  the rest is stitched back together, with audio clips shifting automatically.
+- **Projects** — everything is saved to disk and survives restarts; autosave.
+- **mp4 export** — H.264/AAC + faststart, guaranteed to play everywhere.
+- **Claude Code voiceover integration** — a button copies JSON with frames and
+  timings; Claude Code looks at the frames and returns voiceover text as
+  `{start, end, text}` segments; generate mp3s in any TTS and import them back by
+  timing.
 
-## Стек
+## Stack
 
-- **Бэкенд**: Node.js + Express, [ffmpeg-static](https://www.npmjs.com/package/ffmpeg-static)
-  / ffprobe-static (бинарники ставятся через npm — ffmpeg вручную не нужен).
-- **Фронтенд**: React + Vite + TypeScript, собственный HUD-дизайн на чистом CSS.
+- **Backend**: Node.js + Express, [ffmpeg-static](https://www.npmjs.com/package/ffmpeg-static)
+  / ffprobe-static (binaries installed via npm — no manual ffmpeg needed).
+- **Frontend**: React + Vite + TypeScript, a custom HUD design in plain CSS.
 
-## Требования
+## Requirements
 
-- Node.js 18+ (разрабатывалось на Node 24).
+- Node.js 18+ (developed on Node 24).
 - npm.
 
-ffmpeg устанавливать **не нужно** — он подтягивается пакетом `ffmpeg-static`.
+You do **not** need to install ffmpeg — it's pulled in by the `ffmpeg-static` package.
 
-## Установка и запуск
+## Install & run
 
 ```bash
 git clone https://github.com/gitmir-hello/video-montage.git
 cd video-montage
-npm install          # заодно скачает бинарник ffmpeg
-npm run dev          # бэкенд :3001 + фронтенд :5173
+npm install          # also downloads the ffmpeg binary
+npm run dev          # backend :3001 + frontend :5173
 ```
 
-Открой **http://localhost:5173** — создай проект, загрузи видео, работай.
+Open **http://localhost:5173** — create a project, load a video, start working.
 
-Продакшн-режим (бэкенд отдаёт собранный фронтенд):
+Production mode (backend serves the built frontend):
 
 ```bash
 npm run build
 npm start            # http://localhost:3001
 ```
 
-## Как пользоваться
+## How to use
 
-1. **Создай проект** и загрузи видео → на таймлайне появятся кадры.
-2. **Добавь озвучку**: перетащи mp3 на аудио-дорожку или жми «+ аудио» (можно
-   пачкой). Двигай клипы по времени.
-3. **Обрежь и вычисти**: «⛶ Кроп» — рамка обрезает края кадра; «✂ Вырезать» —
-   тянешь по видео-дорожке, помечая куски на удаление.
-4. **Проверь** — жми ▶: видео играет со звуком и перепрыгивает вырезы.
-5. **Собери mp4** — кнопка «Собрать mp4», затем скачай результат.
+1. **Create a project** and load a video → frames appear on the timeline.
+2. **Add voiceover**: drag mp3s onto the audio track or click "+ audio" (a batch
+   works too). Move clips in time.
+3. **Trim and clean up**: "⛶ Crop" — the frame trims the edges; "✂ Cut" — drag
+   across the video track to mark segments for removal.
+4. **Preview** — hit ▶: the video plays with sound and skips over cuts.
+5. **Export mp4** — the "Export mp4" button, then download the result.
 
-### Озвучка через Claude Code
+### Voiceover via Claude Code
 
-1. **«📋 План озвучки для Claude»** — копирует JSON с кадрами (пути к картинкам) и
-   таймингами.
-2. Вставь в Claude Code — он посмотрит кадры и вернёт `[{start, end, text}, …]`.
-3. Правишь тексты, генеришь mp3 по сегментам в любом TTS, называешь `0.mp3`,
+1. **"📋 Voiceover plan for Claude"** — copies JSON with frames (paths to the
+   images) and timings.
+2. Paste it into Claude Code — it looks at the frames and returns
+   `[{start, end, text}, …]`.
+3. Edit the text, generate an mp3 per segment in any TTS, name them `0.mp3`,
    `1.mp3`, …
-4. **«📥 Импорт озвучки»** — вставляешь тот же JSON + выбираешь mp3; файл `N.mp3`
-   встаёт на `start` сегмента `[N]`.
+4. **"📥 Import voiceover"** — paste the same JSON + select the mp3s; file `N.mp3`
+   lands at the `start` of segment `[N]`.
 
-## Как это устроено
+## How it works
 
-Проекты хранятся на диске как самодостаточные папки:
+Projects are stored on disk as self-contained folders:
 
 ```
 data/projects/<id>/
-  project.json     # метаданные, аудио-ассеты, расстановка клипов, кроп, вырезы
-  video.<ext>      # исходное видео
-  frames/          # мелкие кадры-превью для таймлайна
-  keyframes/       # крупные кадры для анализа Claude Code
-  audio/           # загруженные mp3
-  exports/         # собранные mp4
+  project.json     # metadata, audio assets, clip layout, crop, cuts
+  video.<ext>      # source video
+  frames/          # small preview frames for the timeline
+  keyframes/       # large frames for Claude Code analysis
+  audio/           # uploaded mp3s
+  exports/         # built mp4s
 ```
 
-Кроп хранится в долях (устойчиво к разрешению), вырезы — в секундах. Финальная
-сборка — один вызов ffmpeg с `filter_complex`: вырезы (`trim`+`concat`) → кроп
-(`crop`) → микс озвучки (`adelay`+`amix`), перекод в H.264/AAC.
+Crop is stored in fractions (resolution-independent), cuts in seconds. The final
+export is a single ffmpeg call with `filter_complex`: cuts (`trim`+`concat`) → crop
+(`crop`) → voiceover mix (`adelay`+`amix`), re-encoded to H.264/AAC.
 
-## Лицензия
+## License
 
 [GNU GPL-3.0-or-later](LICENSE) © Vladimir Miroshnichenko
