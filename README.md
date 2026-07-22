@@ -8,6 +8,9 @@ Built for a simple workflow: **take a video, lay a voiceover on top, and export 
 mp4** — with handy [Claude Code](https://claude.com/claude-code) integration that
 generates voiceover text straight from the video frames.
 
+The holographic HUD interface comes from **[gitmir.com](https://gitmir.com)** — a
+visual, AI-native IDE that renders a product's architecture as a living blueprint.
+
 ![Video Montage interface](docs/preview.svg)
 
 ## Features
@@ -102,3 +105,7 @@ export is a single ffmpeg call with `filter_complex`: cuts (`trim`+`concat`) →
 ## License
 
 [GNU GPL-3.0-or-later](LICENSE) © Vladimir Miroshnichenko
+
+---
+
+Made with the holographic design system from **[gitmir.com](https://gitmir.com)**.
